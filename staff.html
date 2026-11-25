@@ -21,11 +21,11 @@ button.g { background:var(--green); }
 .note { font-size:13px; color:var(--soft); }
 .ok { color:var(--green); font-weight:700; } .bad { color:var(--red); font-weight:700; }
 .posters { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap:16px; }
-.poster { background:#fff; border-radius:16px; border:3px solid var(--green); padding:18px; text-align:center; display:grid; gap:6px; justify-items:center; page-break-inside: avoid; break-inside: avoid; position:relative; }
+.poster { background:#fff; border-radius:16px; border:3px solid var(--green); padding:18px; text-align:center; display:grid; gap:6px; justify-items:center; page-break-inside: avoid; break-inside: avoid; position:relative; padding-bottom:34px; }
 .poster .no { font-size:13px; letter-spacing:.2em; color:var(--red); font-weight:700; }
 .poster h3 { font-family:var(--story); font-size:24px; margin:0; }
 .poster .qr { padding:10px; background:#fff; }
-.poster .qr img, .poster .qr canvas { width: 200px; height: 200px; }
+.poster .qr svg { width: 200px; height: 200px; display:block; }
 .poster .place { font-size:14px; color:var(--soft); }
 .poster .code { position:absolute; right:12px; bottom:8px; font-size:12px; color:var(--soft); }
 .poster .code b { font-size:15px; color:var(--ink); letter-spacing:.15em; }
@@ -54,15 +54,15 @@ td, th { border-bottom:1px solid var(--line); padding:6px 8px; text-align:left; 
 
   <section class="card noprint">
     <h2>2. 列印 QR Code 立牌</h2>
-    <p class="note">填入遊戲正式網址（index.html 所在的網址），按「產生立牌」後用瀏覽器列印（每頁兩張）。立牌右下角的地點代碼是給掃不到 QR Code 的組別手動輸入用。</p>
-    <div class="row"><input class="url" id="base" type="url"><button id="gen">產生立牌</button><button class="g" onclick="window.print()">列印</button></div>
+    <p class="note">填入遊戲上線後的網址（dede-quest.html 的網址），按「產生立牌」後用瀏覽器列印（每頁兩張）。立牌右下角的地點代碼是給掃不到 QR Code 的組別手動輸入用。</p>
+    <div class="row"><input class="url" id="base" type="url" placeholder="https://你的網址/dede-quest.html"><button id="gen">產生立牌</button><button class="g" onclick="window.print()">列印</button></div>
     <div class="tw"><table id="tbl"></table></div>
   </section>
 
   <div class="posters" id="posters"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="vendor/qrcode.js"></script>
 <script src="config.js"></script>
 <script>
 const C = window.QUEST_CONFIG;
@@ -70,7 +70,11 @@ const base = document.getElementById("base");
 base.value = location.href.replace(/staff\.html.*$/, "index.html");
 
 function gen() {
-  const url = base.value.split("#")[0];
+  const url = base.value.trim().split("#")[0];
+  if (!/^https?:\/\//.test(url)) {
+    document.getElementById("tbl").innerHTML = "<tr><td>請先在上方填入遊戲上線後的網址（https:// 開頭），再按「產生立牌」。</td></tr>";
+    document.getElementById("posters").innerHTML = ""; return;
+  }
   const items = [{ no: "START", title: "活動入口", place: C.stages[0].place, href: url, code: "" }]
     .concat(C.stages.map(s => ({ no: "第 " + s.id + " 關", title: s.title, place: s.place, href: url + "#" + s.key, code: s.code })));
   document.getElementById("tbl").innerHTML = "<tr><th>立牌</th><th>地點</th><th>地點代碼</th><th>網址</th></tr>" +
@@ -81,7 +85,7 @@ function gen() {
     d.innerHTML = `<div class="no">${i.no}</div><h3>${i.title}</h3><div class="place">📍 ${i.place}</div><div class="qr"></div>
       <div class="note">${i.no === "START" ? "掃描開始 DeDe 的聖誕閱讀冒險" : "掃描打開這一關"}</div>${i.code ? `<div class="code">地點代碼 <b>${i.code}</b></div>` : ""}`;
     box.appendChild(d);
-    new QRCode(d.querySelector(".qr"), { text: i.href, width: 400, height: 400, correctLevel: QRCode.CorrectLevel.M });
+    const q = qrcode(0, "M"); q.addData(i.href); q.make(); d.querySelector(".qr").innerHTML = q.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
   });
 }
 document.getElementById("gen").onclick = gen; gen();
