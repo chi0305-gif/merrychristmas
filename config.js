@@ -15,16 +15,13 @@ window.QUEST_CONFIG = {
   // 完賽驗證碼用的鹽值（請在活動前改成只有工作人員知道的字串）
   salt: "dede-xmas-2026",
 
-  // true：每一關都要掃描 QR Code 或輸入地點代碼才能進入
-  requireScan: true,
-
-  // 每個據點：key 會放在 QR Code 網址的 #後面；code 是印在立牌上的備用地點代碼
+  // 每一關的建議地點與通關字（關卡依序開放，不需要掃 QR Code）
   stages: [
-    { id: 1, key: "go-letter-k4", code: "4821", title: "聖誕老人的遺失信件", short: "聖誕信件", place: "圖書館入口", type: "閱讀理解", char: "暖" },
-    { id: 2, key: "go-snowman-p7", code: "1736", title: "雪人的記憶拼圖",   short: "雪人拼圖", place: "圖書館閱讀區", type: "文字重組", char: "愛" },
-    { id: 3, key: "go-reindeer-m2", code: "5290", title: "麋鹿的神祕書單",   short: "神祕書單", place: "圖書館書架區", type: "書籍偵探", char: "讀" },
-    { id: 4, key: "go-cipher-r9",  code: "8063", title: "聖誕密碼研究所",   short: "密碼研究所", place: "圖書館公共空間", type: "邏輯推理", char: "閱" },
-    { id: 5, key: "go-dede-x5",    code: "1225", title: "DeDe 的最後禮物",  short: "DeDe 終極任務", place: "圖書館聖誕樹旁", type: "終極任務", char: "★" }
+    { id: 1, title: "聖誕老人的遺失信件", short: "聖誕信件", place: "圖書館入口", type: "閱讀理解", char: "暖" },
+    { id: 2, title: "雪人的記憶拼圖",   short: "雪人拼圖", place: "校園穿堂／閱讀區", type: "文字重組", char: "愛" },
+    { id: 3, title: "麋鹿的神祕書單",   short: "神祕書單", place: "圖書館書架區", type: "書籍偵探", char: "讀" },
+    { id: 4, title: "聖誕密碼研究所",   short: "密碼研究所", place: "教學大樓公共空間", type: "邏輯推理", char: "閱" },
+    { id: 5, title: "DeDe 的最後禮物",  short: "DeDe 終極任務", place: "圖書館聖誕樹旁", type: "終極任務", char: "心" }
   ]
 };
 

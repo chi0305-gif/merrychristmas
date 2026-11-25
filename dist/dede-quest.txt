@@ -488,9 +488,9 @@ details.cb[open] summary { margin-bottom: 8px; }
       <h3 style="font-size:20px;margin-bottom:10px">冒險規則</h3>
       <ol class="rules">
         <li>每組只要一支手機。</li>
-        <li>到五個據點掃描 QR Code，打開該關卡。</li>
+        <li>依照地圖順序闖關，完成一關才會打開下一關。</li>
         <li>讀完故事、解開題目，取得一個「通關字」。</li>
-        <li>集滿四個通關字，第五關才會開放。</li>
+        <li>可以到每關建議的地點去找找相關的書與佈置。</li>
         <li>完成後回到圖書館聖誕樹旁，出示完賽畫面兌換小禮物。</li>
       </ol>
     </div>
@@ -573,16 +573,13 @@ window.QUEST_CONFIG = {
   // 完賽驗證碼用的鹽值（請在活動前改成只有工作人員知道的字串）
   salt: "dede-xmas-2026",
 
-  // true：每一關都要掃描 QR Code 或輸入地點代碼才能進入
-  requireScan: true,
-
-  // 每個據點：key 會放在 QR Code 網址的 #後面；code 是印在立牌上的備用地點代碼
+  // 每一關的建議地點與通關字（關卡依序開放，不需要掃 QR Code）
   stages: [
-    { id: 1, key: "go-letter-k4", code: "4821", title: "聖誕老人的遺失信件", short: "聖誕信件", place: "圖書館入口", type: "閱讀理解", char: "暖" },
-    { id: 2, key: "go-snowman-p7", code: "1736", title: "雪人的記憶拼圖",   short: "雪人拼圖", place: "圖書館閱讀區", type: "文字重組", char: "愛" },
-    { id: 3, key: "go-reindeer-m2", code: "5290", title: "麋鹿的神祕書單",   short: "神祕書單", place: "圖書館書架區", type: "書籍偵探", char: "讀" },
-    { id: 4, key: "go-cipher-r9",  code: "8063", title: "聖誕密碼研究所",   short: "密碼研究所", place: "圖書館公共空間", type: "邏輯推理", char: "閱" },
-    { id: 5, key: "go-dede-x5",    code: "1225", title: "DeDe 的最後禮物",  short: "DeDe 終極任務", place: "圖書館聖誕樹旁", type: "終極任務", char: "★" }
+    { id: 1, title: "聖誕老人的遺失信件", short: "聖誕信件", place: "圖書館入口", type: "閱讀理解", char: "暖" },
+    { id: 2, title: "雪人的記憶拼圖",   short: "雪人拼圖", place: "校園穿堂／閱讀區", type: "文字重組", char: "愛" },
+    { id: 3, title: "麋鹿的神祕書單",   short: "神祕書單", place: "圖書館書架區", type: "書籍偵探", char: "讀" },
+    { id: 4, title: "聖誕密碼研究所",   short: "密碼研究所", place: "教學大樓公共空間", type: "邏輯推理", char: "閱" },
+    { id: 5, title: "DeDe 的最後禮物",  short: "DeDe 終極任務", place: "圖書館聖誕樹旁", type: "終極任務", char: "心" }
   ]
 };
 
@@ -650,7 +647,7 @@ const stage = (id) => C.stages.find((s) => s.id === id);
 const isDone = (id) => !!S.done[id];
 const doneCount = () => C.stages.filter((s) => isDone(s.id)).length;
 const firstFourDone = () => [1, 2, 3, 4].every(isDone);
-const isUnlocked = (id) => !C.requireScan || S.demo || !!S.unlocked[id] || isDone(id);
+const isUnlocked = (id) => S.demo || id === 1 || isDone(id) || isDone(id - 1);
 let pendingStage = 0;
 
 /* ================= 畫面切換 ================= */
@@ -692,7 +689,7 @@ function renderHome() {
   $("#slogan").textContent = "「" + C.slogan + "」";
   $("#enName").textContent = C.englishName;
   const b = $("#pendingBanner");
-  if (pendingStage) { b.hidden = false; b.innerHTML = `你掃到了 <b>第${NUM[pendingStage]}關｜${esc(stage(pendingStage).short)}</b>！先建立小隊，就會直接帶你進入關卡。`; }
+  if (pendingStage) { b.hidden = false; b.innerHTML = `你選了 <b>第${NUM[pendingStage]}關｜${esc(stage(pendingStage).short)}</b>！先建立小隊，就會直接帶你進入關卡。`; }
   else b.hidden = true;
   $("#continueRow").hidden = !S.team;
   $("#btnStart").textContent = S.team ? "看序章" : "開始冒險";
@@ -714,7 +711,7 @@ $("#teamForm").addEventListener("submit", (e) => {
   save(); audio.play("start");
   if (pendingStage) { const id = pendingStage; pendingStage = 0; S.unlocked[id] = true; save(); openStage(id); return; }
   show("map");
-  if (isNew) toast("計時開始！先到第一關：" + stage(1).place);
+  if (isNew) toast("計時開始！點地圖上的第一關出發");
 });
 
 /* ================= 地圖 ================= */
@@ -734,7 +731,7 @@ function renderMap() {
   C.stages.forEach((s) => { if (!current && !isDone(s.id)) current = s.id; });
   C.stages.forEach((s) => {
     const [x, y, side] = NODES[s.id];
-    const done = isDone(s.id), locked5 = s.id === 5 && !firstFourDone();
+    const done = isDone(s.id), locked5 = !done && !isUnlocked(s.id);
     const ready = !done && !locked5 && s.id === current;
     const fill = done ? (s.id === 5 ? "#C79A3B" : "#2E5B45") : ready ? "#C23A2E" : "#FFFDF8";
     const fg = done || ready ? "#FFF8EF" : "#B9AA97";
@@ -761,15 +758,15 @@ function renderMap() {
   $("#doneCount").textContent = doneCount();
   const tip = $("#mapTip");
   if (S.finishedAt) tip.textContent = "五片故事都找回來了！點右上角的書本可以重讀完整故事。";
-  else if (current === 5) tip.textContent = "四個通關字到齊！前往" + stage(5).place + "，DeDe 在那裡等你。";
-  else tip.textContent = `下一站：第${NUM[current]}關，請到「${stage(current).place}」掃描 QR Code。`;
+  else if (current === 5) tip.textContent = "四個通關字到齊！點閃紅光的第五關，DeDe 在等你。";
+  else tip.textContent = `點地圖上閃紅光的第${NUM[current]}關開始挑戰（建議地點：${stage(current).place}）。`;
 }
 
 /* ================= 進入關卡 ================= */
 function openStage(id) {
   const s = stage(id);
   if (isDone(id)) { openReward(id, S.done[id].stars, true); return; }
-  if (!isUnlocked(id)) { openScanSheet(id); return; }
+  if (!isUnlocked(id)) { toast(`請先完成第${NUM[id - 1]}關「${stage(id - 1).short}」`); return; }
   if (!S.team) { pendingStage = id; show("home"); return; }
   S.unlocked[id] = true; save();
   $("#stageHead").innerHTML = `
@@ -788,31 +785,6 @@ function setTip(html) {
   t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop");
 }
 function shake(el) { el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake"); }
-
-function openScanSheet(id) {
-  const s = stage(id);
-  const locked5 = id === 5 && !firstFourDone();
-  const ov = overlay(`
-    <div class="modal sheet">
-      <div class="pin"><svg width="28" height="28" style="color:var(--green)"><use href="#pin"/></svg></div>
-      <h3>第${NUM[id]}關｜${esc(s.short)}</h3>
-      <p>請到 <b>${esc(s.place)}</b> 找到 DeDe 的 QR Code 立牌，用手機相機掃描就能開啟關卡。</p>
-      ${locked5 ? `<p class="note">提醒：要先集滿前四個通關字，最後一關才會開放。</p>` : ""}
-      <form id="codeForm" style="display:grid;gap:8px;text-align:left" novalidate>
-        <label class="field" for="placeCode">掃不到？輸入立牌上的地點代碼
-          <input class="input" id="placeCode" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="4 位數字" style="text-align:center;letter-spacing:.4em">
-        </label>
-        <p class="err" id="codeErr"></p>
-        <div class="btn-row"><button type="button" class="btn ghost small" data-close>回地圖</button><button class="btn small green" type="submit">打開關卡</button></div>
-      </form>
-    </div>`);
-  $("#codeForm", ov).addEventListener("submit", (e) => {
-    e.preventDefault();
-    const v = $("#placeCode", ov).value.trim();
-    if (v === s.code) { S.unlocked[id] = true; save(); closeOverlay(); openStage(id); }
-    else { $("#codeErr", ov).textContent = "代碼不對喔，看看立牌右下角的 4 位數字。"; shake($("#placeCode", ov)); }
-  });
-}
 
 /* ================= 共用：選擇題 ================= */
 function mcq(el, { q, opts, ans, hints, onDone }) {
@@ -1176,7 +1148,7 @@ function renderCert() {
     <h2>聖誕閱讀探險家</h2>
     <div class="who">${esc(S.team)}</div>
     <p style="font-family:var(--font-story);font-size:17px;max-width:22em">完成了 DeDe 的五項閱讀挑戰，找回失竊的聖誕故事，正式成為四維聖誕閱讀探險家！</p>
-    <div class="chars-row">${C.stages.slice(0, 4).map((s) => `<span>${esc(s.char)}</span>`).join("")}</div>
+    <div class="chars-row">${C.stages.map((s) => `<span${s.id === 5 ? ' style="background:var(--gold)"' : ""}>${esc(s.char)}</span>`).join("")}</div>
     <div class="cert-grid">
       <div><b>${fmt(S.finishedAt - S.startedAt)}</b><span>完成時間</span></div>
       <div><b>${total}/15</b><span>雪花</span></div>
@@ -1185,7 +1157,9 @@ function renderCert() {
     <p class="note">完賽驗證碼</p>
     <div class="code">${esc(S.code)}</div>
     <p style="font-size:15px">請回到 <b>${esc(stage(5).place)}</b>，把這個畫面給工作人員看，兌換聖誕小禮物。</p>
+    <button class="btn small ghost" id="btnCertPng">下載證書圖片</button>
     ${S.redeemedAt ? `<div class="stamp">已兌換<small>${fmtDate(S.redeemedAt)}</small></div>` : ""}`;
+  $("#btnCertPng").onclick = () => downloadCert(total);
   $("#cert").style.position = "relative";
   const sb = $("#staffBox");
   if (S.redeemedAt) { sb.innerHTML = `<p class="note" style="text-align:center">這張證書已在 ${fmtDate(S.redeemedAt)} 兌換過禮物。謝謝參加！</p>`; }
@@ -1198,6 +1172,46 @@ function renderCert() {
       else { $("#pinErr").textContent = "PIN 不正確。"; shake($("#staffPin")); }
     });
   }
+}
+
+/* 證書圖片：用 canvas 畫一張 1200×1600 的證書並下載 */
+async function downloadCert(total) {
+  try { await document.fonts.ready; } catch (e) {}
+  const W = 1200, H = 1600, c = document.createElement("canvas"); c.width = W; c.height = H;
+  const x = c.getContext("2d"), story = '"LXGW WenKai TC", "Kaiti TC", serif', ui = '"Noto Sans TC", "Microsoft JhengHei", sans-serif';
+  x.fillStyle = "#FBF6EC"; x.fillRect(0, 0, W, H);
+  x.fillStyle = "#F5E7C4"; x.beginPath(); x.arc(W, 0, 260, 0, 7); x.fill();
+  x.fillStyle = "#DCE8DF"; x.beginPath(); x.arc(0, H, 230, 0, 7); x.fill();
+  x.strokeStyle = "#C79A3B"; x.lineWidth = 10; x.strokeRect(40, 40, W - 80, H - 80);
+  x.lineWidth = 2; x.setLineDash([10, 10]); x.strokeRect(64, 64, W - 128, H - 128); x.setLineDash([]);
+  // rosette
+  x.fillStyle = "#2E5B45"; x.beginPath(); x.moveTo(540, 330); x.lineTo(500, 470); x.lineTo(560, 430); x.lineTo(590, 480); x.lineTo(600, 360); x.fill();
+  x.beginPath(); x.moveTo(660, 330); x.lineTo(700, 470); x.lineTo(640, 430); x.lineTo(610, 480); x.lineTo(600, 360); x.fill();
+  x.fillStyle = "#C79A3B"; x.beginPath(); x.arc(600, 260, 120, 0, 7); x.fill();
+  x.fillStyle = "#FFF8EF"; x.beginPath(); x.arc(600, 260, 92, 0, 7); x.fill();
+  const svg = document.querySelector("#dedehead").cloneNode(true);
+  const img = new Image();
+  const src = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">' + svg.innerHTML + "</svg>";
+  await new Promise((r) => { img.onload = r; img.onerror = r; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(src); });
+  try { x.drawImage(img, 520, 175, 160, 160); } catch (e) {}
+  x.textAlign = "center";
+  x.fillStyle = "#C79A3B"; x.font = "700 28px " + ui; x.fillText("A D V E N T U R E   C E R T I F I C A T E", 600, 560);
+  x.fillStyle = "#3B2F2A"; x.font = "700 76px " + story; x.fillText("聖誕閱讀探險家", 600, 660);
+  x.fillStyle = "#C23A2E"; x.font = "700 84px " + story; x.fillText(S.team, 600, 800, 900);
+  x.strokeStyle = "#E7DCCB"; x.lineWidth = 3; x.beginPath(); x.moveTo(300, 830); x.lineTo(900, 830); x.stroke();
+  x.fillStyle = "#3B2F2A"; x.font = "36px " + story;
+  x.fillText("完成了 DeDe 的五項閱讀挑戰，找回失竊的聖誕故事，", 600, 910);
+  x.fillText("正式成為四維聖誕閱讀探險家！", 600, 965);
+  C.stages.forEach((st, i) => { const cx = 600 + (i - 2) * 110; x.fillStyle = i === 4 ? "#C79A3B" : "#2E5B45"; x.beginPath(); x.arc(cx, 1060, 42, 0, 7); x.fill(); x.fillStyle = "#FFF8EF"; x.font = "700 40px " + story; x.fillText(st.char, cx, 1074); });
+  const stats = [[fmt(S.finishedAt - S.startedAt), "完成時間"], [total + "/15", "雪花"], [fmtDate(S.finishedAt), "完賽時刻"]];
+  stats.forEach(([v, l], i) => { const cx = 330 + i * 270; x.fillStyle = "#3B2F2A"; x.font = "700 44px " + ui; x.fillText(v, cx, 1200); x.fillStyle = "#7A6A60"; x.font = "26px " + ui; x.fillText(l, cx, 1242); });
+  x.fillStyle = "#3B2F2A"; x.beginPath(); x.roundRect ? x.roundRect(430, 1300, 340, 86, 16) : x.rect(430, 1300, 340, 86); x.fill();
+  x.fillStyle = "#FBF6EC"; x.font = "700 52px ui-monospace, Menlo, monospace"; x.fillText(S.code.split("").join(" "), 600, 1362);
+  x.fillStyle = "#7A6A60"; x.font = "26px " + ui; x.fillText("完賽驗證碼", 600, 1430);
+  x.fillStyle = "#2E5B45"; x.font = "700 32px " + story; x.fillText(C.eventName, 600, 1500);
+  const a = document.createElement("a"); a.download = "DeDe_Christmas_Certificate.png"; a.href = c.toDataURL("image/png");
+  document.body.appendChild(a); a.click(); a.remove();
+  toast("證書圖片已下載");
 }
 
 /* ================= 小工具 ================= */
@@ -1261,17 +1275,12 @@ function confetti(scale = 1) {
   })();
 }
 
-/* ================= QR Code 進場 ================= */
+/* ================= 測試模式：網址加 #demo 解鎖全部關卡 ================= */
 function handleHash() {
-  const h = decodeURIComponent(location.hash.slice(1));
-  if (!h) return false;
-  const clear = () => { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} };
-  if (h === "demo") { S.demo = true; save(); clear(); toast("測試模式：所有關卡已解鎖"); renderDemoFlag(); return false; }
-  const s = C.stages.find((x) => x.key === h);
-  if (!s) return false;
-  clear();
-  if (!S.team) { pendingStage = s.id; show("home"); return true; }
-  S.unlocked[s.id] = true; save(); closeOverlay(true); openStage(s.id); return true;
+  if (decodeURIComponent(location.hash.slice(1)) !== "demo") return false;
+  S.demo = true; save();
+  try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+  toast("測試模式：所有關卡已解鎖"); renderDemoFlag(); return false;
 }
 function renderDemoFlag() { if (S.demo && !$(".demo-flag")) { const d = document.createElement("div"); d.className = "demo-flag"; d.textContent = "測試模式"; document.body.appendChild(d); } }
 addEventListener("hashchange", handleHash);
