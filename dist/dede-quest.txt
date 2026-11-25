@@ -1,0 +1,1284 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DeDe 聖誕閱讀探險</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: 一本會動的聖誕故事書。米白紙張為底，紅／綠只用在「可以按」和「已完成」，金色只給獎勵。
+   Deliberately single-theme: the storybook look stays cream in both light and dark hosts. */
+:root {
+  --paper: #FBF6EC;      /* 奶油白紙張 */
+  --card: #FFFDF8;       /* 內頁 */
+  --ink: #3B2F2A;        /* 可可色墨水 */
+  --ink-soft: #7A6A60;
+  --line: #E7DCCB;
+  --red: #C23A2E;        /* 聖誕紅：行動 */
+  --red-deep: #9E2B22;
+  --green: #2E5B45;      /* 森林綠：完成 */
+  --green-soft: #DCE8DF;
+  --gold: #C79A3B;       /* 金：獎勵 */
+  --gold-soft: #F5E7C4;
+  --sky: #A9C2D4;        /* 雪夜藍 */
+  --sky-deep: #6E8EA6;
+  --dede: #8A4A2B;
+  --dede-dark: #5E301B;
+  --font-story: "LXGW WenKai TC", "Kaiti TC", "BiauKai", "STKaiti", serif;
+  --font-ui: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  --r: 18px;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-tap-highlight-color: transparent;
+  overflow-x: hidden;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--font-story); font-weight: 700; text-wrap: balance; margin: 0; line-height: 1.3; }
+p { margin: 0; }
+
+#snow { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+#fx { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 60; }
+
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 560px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px 40px;
+}
+.screen { display: flex; flex-direction: column; gap: 18px; animation: pagein .45s ease both; }
+@keyframes pagein { from { opacity: .001; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ---------- buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; border-radius: 999px; padding: 14px 26px;
+  background: var(--red); color: #FFF8EF; font-weight: 700; font-size: 17px; letter-spacing: .04em;
+  box-shadow: 0 4px 0 var(--red-deep);
+  transition: transform .12s, box-shadow .12s;
+}
+.btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--red-deep); }
+.btn.green { background: var(--green); box-shadow: 0 4px 0 #1E3F2F; }
+.btn.ghost { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); }
+.btn.ghost:active { box-shadow: inset 0 0 0 2px var(--ink-soft); }
+.btn.small { padding: 9px 16px; font-size: 14px; }
+.btn[disabled] { opacity: .45; pointer-events: none; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+/* ---------- top bar ---------- */
+.topbar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+  display: flex; align-items: center; gap: 10px;
+  background: color-mix(in srgb, var(--paper) 92%, transparent);
+  backdrop-filter: blur(6px);
+  padding: 8px 0; margin-bottom: 4px;
+  border-bottom: 1px dashed var(--line);
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
+.team { font-family: var(--font-story); font-weight: 700; font-size: 17px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+.team small { display: block; font-family: var(--font-ui); font-weight: 500; font-size: 11px; color: var(--ink-soft); letter-spacing: .08em; line-height: 1.2; }
+.timer { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15px; padding: 4px 10px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); }
+.timer.over { color: var(--red); box-shadow: inset 0 0 0 1.5px var(--red); }
+.iconbtn { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); display: grid; place-items: center; flex: none; }
+.iconbtn svg { width: 22px; height: 22px; }
+.frag-dots { display: flex; gap: 4px; }
+.frag-dots span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-story); font-size: 12px; font-weight: 700; background: var(--card); color: var(--line); box-shadow: inset 0 0 0 1.5px var(--line); }
+.frag-dots span.on { background: var(--green); color: #FFF8EF; box-shadow: none; }
+.frag-dots span.on.final { background: var(--gold); }
+@media (max-width: 380px) { .frag-dots { display: none; } }
+
+/* ---------- home ---------- */
+.cover { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 6px; }
+.eyebrow { font-size: 12px; letter-spacing: .22em; color: var(--green); font-weight: 700; }
+.cover h1 { font-size: clamp(28px, 8vw, 40px); }
+.cover h1 .sub { display: block; font-size: .62em; color: var(--red); margin-top: 4px; }
+.globe { width: min(320px, 82vw); aspect-ratio: 1; max-width: 100%; }
+.slogan { font-family: var(--font-story); font-size: 18px; color: var(--ink-soft); max-width: 22em; }
+.en { font-size: 12px; letter-spacing: .3em; color: var(--ink-soft); }
+.banner { background: var(--gold-soft); border-radius: 14px; padding: 12px 16px; font-size: 15px; text-align: left; width: 100%; }
+.banner b { color: var(--red); }
+.facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; }
+.facts div { background: var(--card); border-radius: 14px; padding: 10px 6px; box-shadow: inset 0 0 0 1px var(--line); }
+.facts b { display: block; font-family: var(--font-story); font-size: 22px; color: var(--green); line-height: 1.2; }
+.facts span { font-size: 12px; color: var(--ink-soft); }
+
+/* ---------- story page ---------- */
+.page {
+  background: var(--card); border-radius: var(--r); padding: 22px 20px;
+  box-shadow: 0 1px 0 var(--line), 0 12px 30px -18px rgba(59,47,42,.35);
+  position: relative;
+}
+.page.deckle::after { content: ""; position: absolute; inset: 8px; border: 1px dashed var(--line); border-radius: 12px; pointer-events: none; }
+.story { font-family: var(--font-story); font-size: 18px; line-height: 1.95; display: flex; flex-direction: column; gap: 10px; }
+.story .drop::first-letter { font-size: 2.2em; float: left; line-height: 1; margin: 4px 6px 0 0; color: var(--red); }
+.rules { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; counter-reset: r; }
+.rules li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; }
+.rules li::before { counter-increment: r; content: counter(r); flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--green-soft); color: var(--green); font-weight: 700; font-size: 13px; display: grid; place-items: center; margin-top: 2px; }
+label.field { display: grid; gap: 6px; font-weight: 700; font-size: 15px; }
+.input {
+  width: 100%; font: inherit; font-size: 18px; padding: 12px 16px; border-radius: 14px;
+  border: 2px solid var(--line); background: var(--card); color: var(--ink);
+}
+.input:focus { border-color: var(--green); outline: none; }
+.note { font-size: 13px; color: var(--ink-soft); }
+.err { color: var(--red); font-size: 14px; min-height: 1.4em; }
+
+/* ---------- map ---------- */
+.map-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.map-head h2 { font-size: 24px; }
+.progress { font-size: 13px; color: var(--ink-soft); text-align: right; }
+.progress b { font-family: var(--font-story); font-size: 22px; color: var(--green); }
+.mapbox { background: linear-gradient(#EEF3F5, var(--card) 60%); border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+.mapbox svg { display: block; width: 100%; height: auto; }
+.node { cursor: pointer; }
+.node:focus-visible { outline: none; }
+.node:focus-visible .ring { stroke: var(--gold); stroke-width: 4; }
+.node.ready .ring { animation: pulse 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes pulse { 50% { transform: scale(1.12); opacity: .5; } }
+.map-tip { font-size: 14px; color: var(--ink-soft); text-align: center; }
+
+/* ---------- stage ---------- */
+.stage-head { display: grid; gap: 6px; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font-size: 12px; font-weight: 700; letter-spacing: .06em; padding: 3px 10px; border-radius: 999px; background: var(--green-soft); color: var(--green); }
+.chip.red { background: #F6DEDA; color: var(--red-deep); }
+.chip.plain { background: transparent; color: var(--ink-soft); box-shadow: inset 0 0 0 1px var(--line); }
+.stage-head h2 { font-size: 26px; }
+.lead { font-family: var(--font-story); font-size: 17px; color: var(--ink-soft); }
+.play { display: flex; flex-direction: column; gap: 16px; }
+.q { font-weight: 700; font-size: 17px; }
+.opts { display: grid; gap: 10px; }
+.opt {
+  text-align: left; display: flex; gap: 12px; align-items: center;
+  border: 0; border-radius: 14px; padding: 13px 16px; background: var(--card);
+  box-shadow: inset 0 0 0 2px var(--line); font-size: 16px; transition: box-shadow .15s, background .15s, transform .1s;
+}
+.opt:active { transform: scale(.98); }
+.opt .k { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--paper); font-weight: 700; font-size: 14px; }
+.opt.wrong { box-shadow: inset 0 0 0 2px var(--red); background: #FBEDEA; opacity: .7; }
+.opt.right { box-shadow: inset 0 0 0 2px var(--green); background: var(--green-soft); }
+.opt.right .k { background: var(--green); color: #fff; }
+.shake { animation: shake .4s; }
+@keyframes shake { 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+
+.tip { display: flex; gap: 10px; align-items: flex-end; }
+.tip svg { width: 64px; flex: none; }
+.bubble { position: relative; background: var(--card); border-radius: 16px 16px 16px 4px; padding: 10px 14px; font-size: 15px; box-shadow: inset 0 0 0 1.5px var(--line); min-width: 0; }
+.bubble b { color: var(--red); }
+.tip.pop .bubble { animation: pop .35s ease; }
+@keyframes pop { 0% { transform: scale(.85); } 70% { transform: scale(1.04); } 100% { transform: none; } }
+
+/* stage 1 envelope */
+.envelope-btn { border: 0; background: none; padding: 0; width: 100%; display: grid; place-items: center; gap: 6px; }
+.envelope-btn svg { width: min(300px, 100%); height: auto; overflow: visible; }
+.envelope-btn .flap { transform-origin: 150px 40px; transition: transform .6s ease; }
+.envelope-btn.open .flap { transform: scaleY(-1); }
+.envelope-btn .seal { transition: opacity .3s; }
+.envelope-btn.open .seal { opacity: 0; }
+.hint-line { font-size: 14px; color: var(--ink-soft); }
+.letter {
+  font-family: var(--font-story); font-size: 18px; line-height: 2;
+  background: repeating-linear-gradient(var(--card) 0 35px, var(--line) 35px 36px);
+  border-radius: 6px; padding: 14px 20px 18px; box-shadow: 0 10px 26px -16px rgba(59,47,42,.5);
+  border-top: 6px solid; border-image: repeating-linear-gradient(90deg, var(--red) 0 14px, var(--card) 14px 20px, var(--green) 20px 34px, var(--card) 34px 40px) 6;
+  animation: unfold .6s ease both;
+}
+.letter .sign { text-align: right; }
+@keyframes unfold { from { transform: translateY(-14px) scaleY(.6); opacity: .001; } to { transform: none; opacity: 1; } }
+mark { background: linear-gradient(transparent 55%, var(--gold-soft) 55%); color: inherit; }
+
+/* stage 2 tiles */
+.art { display: grid; place-items: center; }
+.art svg { width: min(200px, 60%); height: auto; }
+.slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.slot {
+  min-height: 58px; border-radius: 12px; border: 2px dashed var(--line); background: transparent;
+  font-family: var(--font-story); font-size: 18px; font-weight: 700; display: grid; place-items: center; padding: 4px;
+}
+.slot.filled { border-style: solid; border-color: var(--sky-deep); background: var(--card); }
+.slots.good .slot { border-color: var(--green); background: var(--green-soft); color: var(--green); }
+.tiles { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; min-height: 54px; }
+.tile {
+  border: 0; border-radius: 12px; padding: 10px 18px; background: var(--card);
+  font-family: var(--font-story); font-size: 19px; font-weight: 700;
+  box-shadow: inset 0 0 0 2px var(--sky-deep), 0 3px 0 var(--sky-deep);
+  transform: rotate(var(--rot, 0deg)); transition: transform .12s;
+}
+.tile:active { transform: translateY(2px); }
+.tile.used { visibility: hidden; }
+
+/* stage 3 clue cards + shelf */
+.clues { display: grid; gap: 10px; }
+.clue { border: 0; padding: 0; background: none; perspective: 800px; text-align: left; }
+.clue .in { position: relative; min-height: 64px; transition: transform .5s; transform-style: preserve-3d; }
+.clue.flipped .in { transform: rotateX(180deg); }
+.clue .face { position: absolute; inset: 0; border-radius: 14px; display: flex; align-items: center; gap: 12px; padding: 10px 16px; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.clue .front { background: var(--green); color: #FFF8EF; font-weight: 700; }
+.clue .front i { font-style: normal; margin-left: auto; font-size: 13px; opacity: .8; font-weight: 500; }
+.clue .back { background: var(--card); box-shadow: inset 0 0 0 2px var(--green); transform: rotateX(180deg); font-family: var(--font-story); font-size: 17px; }
+.clue .n { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.2); font-size: 14px; }
+.clue .back .n { background: var(--green-soft); color: var(--green); font-weight: 700; }
+.shelf { display: flex; justify-content: center; align-items: flex-end; gap: 10px; padding: 18px 12px 0; border-bottom: 10px solid #A27852; border-radius: 4px; background: linear-gradient(transparent 70%, rgba(162,120,82,.12)); }
+.spine {
+  border: 0; width: 58px; height: 178px; border-radius: 6px 6px 2px 2px; color: #FFF8EF;
+  writing-mode: vertical-rl; font-family: var(--font-story); font-size: 18px; font-weight: 700; letter-spacing: .12em;
+  display: flex; align-items: center; justify-content: center; position: relative;
+  box-shadow: inset -6px 0 0 rgba(0,0,0,.12), inset 0 14px 0 rgba(255,255,255,.12);
+  transition: transform .25s;
+}
+.spine:nth-child(2) { height: 196px; } .spine:nth-child(3) { height: 166px; } .spine:nth-child(4) { height: 188px; }
+.spine::before, .spine::after { content: ""; position: absolute; left: 8px; right: 8px; height: 3px; background: rgba(255,248,239,.55); }
+.spine::before { top: 22px; } .spine::after { bottom: 22px; }
+.spine:hover, .spine:focus-visible { transform: translateY(-8px); }
+.spine.wrong { animation: shake .4s; opacity: .45; }
+.spine.right { transform: translateY(-26px) rotate(-4deg); box-shadow: 0 0 0 4px var(--gold); }
+.shelf.locked .spine { opacity: .5; pointer-events: none; }
+
+/* stage 4 cipher */
+.baubles { display: flex; justify-content: center; gap: 14px; position: relative; padding-top: 18px; }
+.baubles::before { content: ""; position: absolute; left: 4%; right: 4%; top: 6px; height: 22px; border-top: 2px solid var(--gold); border-radius: 50%; }
+.bauble { position: relative; width: 60px; height: 60px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: 22px; color: #FFF8EF; font-variant-numeric: tabular-nums; animation: sway 3s ease-in-out infinite; transform-origin: 50% -20px; }
+.bauble::before { content: ""; position: absolute; top: -9px; width: 14px; height: 9px; background: var(--gold); border-radius: 3px 3px 0 0; }
+.bauble::after { content: ""; position: absolute; top: 10px; left: 13px; width: 12px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.4); transform: rotate(-30deg); }
+.bauble:nth-child(2) { animation-delay: -.7s; } .bauble:nth-child(3) { animation-delay: -1.4s; } .bauble:nth-child(4) { animation-delay: -2.1s; }
+@keyframes sway { 50% { transform: rotate(5deg); } }
+.answer { display: flex; justify-content: center; gap: 10px; }
+.answer span { width: 52px; height: 60px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 2px var(--line); display: grid; place-items: center; font-size: 28px; font-weight: 700; }
+.answer span.cur { box-shadow: inset 0 0 0 2px var(--gold); }
+.answer.good span { box-shadow: inset 0 0 0 2px var(--green); background: var(--green-soft); color: var(--green); }
+.keys { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.key { border: 0; border-radius: 10px; padding: 9px 0; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line), 0 2px 0 var(--line); font-weight: 700; font-size: 16px; }
+.key:active { transform: translateY(2px); box-shadow: inset 0 0 0 1.5px var(--line); }
+.key.wide { grid-column: span 2; font-size: 14px; }
+.codebook { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 4px; font-size: 13px; text-align: center; font-variant-numeric: tabular-nums; }
+.codebook div { background: var(--paper); border-radius: 8px; padding: 4px 0; line-height: 1.3; }
+.codebook b { display: block; font-size: 15px; }
+details.cb summary { cursor: pointer; font-weight: 700; font-size: 15px; color: var(--green); padding: 4px 0; }
+details.cb[open] summary { margin-bottom: 8px; }
+
+/* stage 5 gift */
+.gift { display: grid; place-items: center; }
+.gift svg { width: min(240px, 70%); height: auto; overflow: visible; }
+.gift .lid { transition: transform .9s cubic-bezier(.3,1.4,.5,1); transform-origin: 120px 90px; }
+.gift.open .lid { transform: translate(40px, -90px) rotate(24deg); }
+.gift .pup { transform: translateY(70px); transition: transform .7s .4s cubic-bezier(.3,1.5,.5,1); }
+.gift.open .pup { transform: translateY(0); }
+.gift .lock { transition: opacity .3s; }
+.gift.open .lock { opacity: 0; }
+.lockrow { display: flex; justify-content: center; gap: 10px; }
+.lockrow .slot { width: 60px; min-height: 60px; font-size: 24px; border-color: var(--gold); }
+.lockrow .slot.filled { background: var(--gold-soft); border-color: var(--gold); }
+.lockrow.good .slot { background: var(--green); color: #FFF8EF; border-color: var(--green); }
+.chars .tile { box-shadow: inset 0 0 0 2px var(--gold), 0 3px 0 var(--gold); font-size: 24px; padding: 8px 18px; }
+.locked-card { text-align: center; display: grid; gap: 12px; justify-items: center; }
+.missing { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+/* ---------- overlay / modal ---------- */
+.overlay {
+  position: fixed; inset: 0; z-index: 50; background: rgba(46,36,32,.55); backdrop-filter: blur(3px);
+  display: grid; place-items: center; overflow-y: auto;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+  animation: fade .25s ease;
+}
+@keyframes fade { from { opacity: 0; } }
+.modal { width: min(460px, 100%); background: var(--card); border-radius: 22px; padding: 26px 22px 22px; display: grid; gap: 14px; text-align: center; animation: rise .45s cubic-bezier(.3,1.3,.5,1); position: relative; }
+@keyframes rise { from { transform: translateY(30px) scale(.94); opacity: .001; } }
+.modal h3 { font-size: 22px; }
+.seal-big {
+  width: 96px; height: 96px; margin: -70px auto 0; border-radius: 50%; display: grid; place-items: center;
+  background: radial-gradient(circle at 35% 30%, #E25A4C, var(--red) 55%, var(--red-deep));
+  color: #FFF8EF; font-family: var(--font-story); font-size: 44px; font-weight: 700;
+  box-shadow: 0 0 0 6px var(--card), 0 8px 20px rgba(158,43,34,.45);
+  animation: stamp .6s cubic-bezier(.3,1.6,.5,1) both .15s;
+}
+.seal-big.gold { background: radial-gradient(circle at 35% 30%, #E8C56E, var(--gold) 55%, #9A7425); }
+@keyframes stamp { from { transform: scale(2.2) rotate(-25deg); opacity: 0; } }
+.stars { display: flex; justify-content: center; gap: 6px; }
+.stars svg { width: 28px; height: 28px; }
+.frag { text-align: left; background: var(--paper); border-radius: 14px; padding: 14px 16px; display: grid; gap: 6px; }
+.frag h4 { margin: 0; font-family: var(--font-story); font-size: 17px; color: var(--green); }
+.frag p { font-family: var(--font-story); font-size: 17px; line-height: 1.85; }
+.bookrec { text-align: left; display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px; box-shadow: inset 0 0 0 1.5px var(--line); }
+.bookrec .cover-mini { flex: none; width: 40px; height: 56px; border-radius: 3px 6px 6px 3px; background: var(--green); box-shadow: inset 5px 0 0 rgba(0,0,0,.15); }
+.bookrec div { min-width: 0; }
+.bookrec small { display: block; color: var(--gold); font-weight: 700; font-size: 12px; letter-spacing: .1em; }
+.bookrec b { font-family: var(--font-story); font-size: 17px; }
+.bookrec p { font-size: 14px; color: var(--ink-soft); line-height: 1.55; }
+.sheet .pin { width: 56px; height: 56px; margin: 0 auto; border-radius: 50%; background: var(--green-soft); display: grid; place-items: center; }
+.toast { position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 70; background: var(--ink); color: var(--paper); padding: 12px 20px; border-radius: 999px; font-size: 15px; box-shadow: 0 10px 30px rgba(0,0,0,.25); animation: rise .4s ease; max-width: calc(100% - 32px); text-align: center; }
+
+/* ---------- book (collection) ---------- */
+.badges { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.badge { display: flex; gap: 10px; align-items: center; padding: 12px; border-radius: 16px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); filter: grayscale(1); opacity: .55; }
+.badge.on { filter: none; opacity: 1; box-shadow: inset 0 0 0 2px var(--gold); }
+.badge svg { width: 46px; height: 46px; flex: none; }
+.badge b { display: block; font-size: 14px; line-height: 1.35; }
+.badge span { font-size: 12px; color: var(--ink-soft); line-height: 1.35; display: block; }
+.pages { display: grid; gap: 12px; }
+.fpage { display: flex; gap: 14px; align-items: flex-start; padding: 16px; border-radius: var(--r); background: var(--card); box-shadow: inset 0 0 0 1px var(--line); text-align: left; border: 0; width: 100%; }
+.fpage .num { flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-story); font-size: 24px; font-weight: 700; background: var(--paper); color: var(--line); box-shadow: inset 0 0 0 2px dashed var(--line); }
+.fpage.got .num { background: var(--green); color: #FFF8EF; }
+.fpage.got.final .num { background: var(--gold); }
+.fpage div { min-width: 0; }
+.fpage b { font-family: var(--font-story); font-size: 17px; display: block; }
+.fpage p { font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+.fpage.snowy p { font-style: italic; }
+.danger { font-size: 13px; color: var(--ink-soft); background: none; border: 0; text-decoration: underline; padding: 6px; }
+
+/* ---------- full story ---------- */
+.chapter { display: grid; gap: 6px; padding-block: 12px; border-bottom: 1px dashed var(--line); }
+.chapter:last-child { border-bottom: 0; }
+.chapter h3 { font-size: 18px; color: var(--green); display: flex; gap: 8px; align-items: center; }
+.chapter h3 span { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--red); color: #FFF8EF; font-size: 15px; }
+.chapter p { font-family: var(--font-story); font-size: 18px; line-height: 1.95; }
+.moral { text-align: center; font-family: var(--font-story); font-size: 22px; color: var(--red); padding: 16px 0 4px; }
+
+/* ---------- certificate ---------- */
+.cert { text-align: center; display: grid; gap: 12px; justify-items: center; padding: 28px 20px; background:
+  radial-gradient(circle at 100% 0, var(--gold-soft) 0 70px, transparent 71px),
+  radial-gradient(circle at 0 100%, var(--green-soft) 0 60px, transparent 61px), var(--card); }
+.cert .rosette { width: 120px; }
+.cert .lbl { font-size: 12px; letter-spacing: .3em; color: var(--gold); font-weight: 700; }
+.cert h2 { font-size: 26px; }
+.cert .who { font-family: var(--font-story); font-size: 30px; color: var(--red); border-bottom: 2px solid var(--line); padding: 0 18px 4px; max-width: 100%; overflow-wrap: anywhere; }
+.cert-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; }
+.cert-grid div { background: var(--paper); border-radius: 12px; padding: 8px 4px; }
+.cert-grid b { display: block; font-size: 18px; font-variant-numeric: tabular-nums; }
+.cert-grid span { font-size: 12px; color: var(--ink-soft); }
+.code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 26px; font-weight: 700; letter-spacing: .2em; background: var(--ink); color: var(--paper); padding: 6px 16px; border-radius: 10px; }
+.chars-row { display: flex; gap: 6px; }
+.chars-row span { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--green); color: #FFF8EF; font-family: var(--font-story); font-weight: 700; }
+.stamp { position: absolute; right: 18px; top: 120px; transform: rotate(-14deg); border: 3px solid var(--red); color: var(--red); border-radius: 10px; padding: 4px 12px; font-weight: 700; font-size: 20px; letter-spacing: .1em; background: rgba(255,253,248,.85); animation: stamp .5s ease both; line-height: 1.3; }
+.stamp small { display: block; font-size: 11px; letter-spacing: 0; font-weight: 500; }
+.staff { display: grid; gap: 8px; width: 100%; text-align: left; background: var(--paper); border-radius: 14px; padding: 14px; }
+.staff .row { display: flex; gap: 8px; }
+.staff .row .input { flex: 1; min-width: 0; font-size: 16px; padding: 10px 12px; }
+
+.demo-flag { position: fixed; z-index: 40; left: max(10px, env(safe-area-inset-left, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); font-size: 12px; background: var(--gold); color: #fff; padding: 3px 10px; border-radius: 999px; font-weight: 700; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; transition-duration: .001s !important; }
+}
+</style>
+</head>
+<body>
+<canvas id="snow" aria-hidden="true"></canvas>
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<!-- reusable drawings -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="dede" viewBox="0 0 240 140">
+      <ellipse cx="110" cy="128" rx="92" ry="7" fill="#3B2F2A" opacity=".12"/>
+      <path d="M34 66 Q12 50 20 34" stroke="#7A4126" stroke-width="8" fill="none" stroke-linecap="round"/>
+      <rect x="46" y="84" width="14" height="40" rx="7" fill="#6B3820"/>
+      <rect x="68" y="84" width="14" height="40" rx="7" fill="#7A4126"/>
+      <rect x="140" y="84" width="14" height="40" rx="7" fill="#6B3820"/>
+      <rect x="162" y="84" width="14" height="40" rx="7" fill="#7A4126"/>
+      <rect x="30" y="54" width="154" height="46" rx="23" fill="#8A4A2B"/>
+      <rect x="60" y="54" width="94" height="46" rx="10" fill="#C23A2E"/>
+      <rect x="60" y="54" width="7" height="46" rx="3" fill="#FFF8EF"/>
+      <rect x="147" y="54" width="7" height="46" rx="3" fill="#FFF8EF"/>
+      <rect x="101" y="54" width="12" height="46" fill="#3B2F2A"/>
+      <rect x="98" y="69" width="18" height="16" rx="3" fill="none" stroke="#C79A3B" stroke-width="3.5"/>
+      <path d="M170 60 Q176 40 184 34" stroke="#8A4A2B" stroke-width="22" stroke-linecap="round" fill="none"/>
+      <circle cx="190" cy="40" r="25" fill="#8A4A2B"/>
+      <ellipse cx="214" cy="49" rx="17" ry="11" fill="#9C5733"/>
+      <circle cx="228" cy="45" r="5.5" fill="#2A1B14"/>
+      <path d="M176 30 Q160 60 174 78 Q190 66 186 32Z" fill="#5E301B"/>
+      <circle cx="200" cy="34" r="3.6" fill="#2A1B14"/>
+      <circle cx="206" cy="52" r="4" fill="#E58C7E" opacity=".55"/>
+      <path d="M168 22 Q184 -12 224 6 Q210 10 212 22Z" fill="#C23A2E"/>
+      <rect x="164" y="16" width="52" height="12" rx="6" fill="#FFF8EF"/>
+      <circle cx="226" cy="6" r="7.5" fill="#FFF8EF"/>
+    </symbol>
+    <symbol id="dedehead" viewBox="0 0 80 80">
+      <circle cx="40" cy="44" r="24" fill="#8A4A2B"/>
+      <ellipse cx="40" cy="58" rx="13" ry="10" fill="#9C5733"/>
+      <ellipse cx="40" cy="53" rx="5" ry="4" fill="#2A1B14"/>
+      <path d="M17 34 Q6 60 18 70 Q28 58 24 36Z" fill="#5E301B"/>
+      <path d="M63 34 Q74 60 62 70 Q52 58 56 36Z" fill="#5E301B"/>
+      <circle cx="31" cy="42" r="3.2" fill="#2A1B14"/><circle cx="49" cy="42" r="3.2" fill="#2A1B14"/>
+      <path d="M18 28 Q36 -4 66 14 Q56 18 60 28Z" fill="#C23A2E"/>
+      <rect x="15" y="23" width="50" height="10" rx="5" fill="#FFF8EF"/>
+      <circle cx="68" cy="13" r="6" fill="#FFF8EF"/>
+    </symbol>
+    <symbol id="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></symbol>
+    <symbol id="flake" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/><path d="M9 4l3 2 3-2M9 20l3-2 3 2M3 10.5l3.5-.3L5 7M21 13.5l-3.5.3L19 17M3 13.5l3.5.3L5 17M21 10.5l-3.5-.3L19 7"/></g></symbol>
+    <symbol id="pin" viewBox="0 0 24 24"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z" fill="currentColor"/><circle cx="12" cy="10" r="2.6" fill="#FFFDF8"/></symbol>
+  </defs>
+</svg>
+
+<div class="wrap" id="app">
+
+  <div class="topbar" id="topbar" hidden>
+    <div class="team"><small>探險小隊</small><span id="teamName"></span></div>
+    <div class="frag-dots" id="fragDots" aria-label="故事碎片"></div>
+    <div class="timer" id="timer" title="遊戲時間">00:00</div>
+    <button class="iconbtn" id="btnMap" aria-label="冒險地圖">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>
+    </button>
+    <button class="iconbtn" id="btnBook" aria-label="故事收藏冊">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5z"/><path d="M12 6v14"/></svg>
+    </button>
+    <button class="iconbtn" id="btnSound" aria-label="音效開關">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path id="soundWave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
+    </button>
+  </div>
+
+  <!-- 01 首頁 -->
+  <section class="screen" data-screen="home" hidden>
+    <div class="cover">
+      <div class="eyebrow" id="eventName"></div>
+      <svg class="globe" viewBox="0 0 320 320" role="img" aria-label="戴聖誕帽的臘腸狗 DeDe 坐在打開的故事書上">
+        <defs><clipPath id="dome"><circle cx="160" cy="150" r="138"/></clipPath></defs>
+        <circle cx="160" cy="150" r="138" fill="#A9C2D4"/>
+        <g clip-path="url(#dome)">
+          <circle cx="160" cy="150" r="138" fill="url(#none)" />
+          <g fill="#FFF8EF">
+            <path d="M160 40l4 14 14 4-14 4-4 14-4-14-14-4 14-4z"/>
+            <circle cx="80" cy="80" r="3"/><circle cx="240" cy="70" r="2.5"/><circle cx="260" cy="130" r="3"/><circle cx="60" cy="150" r="2"/><circle cx="110" cy="50" r="2"/><circle cx="215" cy="110" r="2"/>
+            <path d="M96 112l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z"/><path d="M238 170l2.5 6 6 2.5-6 2.5-2.5 6-2.5-6-6-2.5 6-2.5z"/>
+          </g>
+          <path d="M0 250 Q80 225 160 245 T320 238 V320 H0z" fill="#DCE8EE"/>
+        </g>
+        <!-- open book -->
+        <path d="M30 262 Q95 232 160 256 Q225 232 290 262 L290 276 Q225 248 160 272 Q95 248 30 276z" fill="#3E566A"/>
+        <path d="M38 254 Q98 222 160 248 L160 266 Q98 240 38 268z" fill="#FFFDF8"/>
+        <path d="M282 254 Q222 222 160 248 L160 266 Q222 240 282 268z" fill="#F1F5F7"/>
+        <g stroke="#DCE8EE" stroke-width="2" fill="none"><path d="M58 250 Q100 232 146 250"/><path d="M262 250 Q220 232 174 250"/></g>
+        <use href="#dede" x="70" y="160" width="170" height="99"/>
+        <rect x="60" y="290" width="200" height="18" rx="6" fill="#2E5B45"/>
+        <text x="160" y="303.5" text-anchor="middle" font-size="10" fill="#FFF8EF" font-family="Noto Sans TC, sans-serif" letter-spacing="2">CHRISTMAS STORY BOOK</text>
+      </svg>
+      <h1>聖誕故事失竊事件<span class="sub">DeDe 的最後任務</span></h1>
+      <p class="slogan" id="slogan"></p>
+      <div class="banner" id="pendingBanner" hidden></div>
+      <div class="facts">
+        <div><b>5</b><span>個關卡</span></div>
+        <div><b>10</b><span>分鐘完成</span></div>
+        <div><b>1–4</b><span>人一組</span></div>
+      </div>
+      <div class="btn-row"><button class="btn" id="btnStart">開始冒險</button></div>
+      <div class="btn-row" id="continueRow" hidden><button class="btn green" id="btnContinue">繼續冒險</button></div>
+      <p class="en" id="enName"></p>
+    </div>
+  </section>
+
+  <!-- 序章 + 建立隊伍 -->
+  <section class="screen" data-screen="prologue" hidden>
+    <div class="page deckle">
+      <div class="story" id="prologueText"></div>
+    </div>
+    <div class="page">
+      <h3 style="font-size:20px;margin-bottom:10px">冒險規則</h3>
+      <ol class="rules">
+        <li>每組只要一支手機。</li>
+        <li>到五個據點掃描 QR Code，打開該關卡。</li>
+        <li>讀完故事、解開題目，取得一個「通關字」。</li>
+        <li>集滿四個通關字，第五關才會開放。</li>
+        <li>完成後回到圖書館聖誕樹旁，出示完賽畫面兌換小禮物。</li>
+      </ol>
+    </div>
+    <form class="page" id="teamForm" style="display:grid;gap:12px" novalidate>
+      <label class="field" for="teamInput">幫你們的小隊取個名字
+        <input class="input" id="teamInput" maxlength="12" autocomplete="off" placeholder="例如：205 薑餅人小隊">
+      </label>
+      <p class="note">可以用暱稱或班級代號，不需要填寫姓名和學號。</p>
+      <p class="err" id="teamErr"></p>
+      <button class="btn" type="submit">出發！計時開始</button>
+    </form>
+  </section>
+
+  <!-- 02 冒險地圖 -->
+  <section class="screen" data-screen="map" hidden>
+    <div class="map-head">
+      <div><div class="eyebrow">ADVENTURE MAP</div><h2>冒險任務地圖</h2></div>
+      <div class="progress"><b id="doneCount">0</b> / 5 片故事</div>
+    </div>
+    <div class="mapbox"><svg id="mapSvg" viewBox="0 0 360 560" role="group" aria-label="五個關卡的位置"></svg></div>
+    <p class="map-tip" id="mapTip"></p>
+  </section>
+
+  <!-- 03 關卡 -->
+  <section class="screen" data-screen="stage" hidden>
+    <div class="stage-head" id="stageHead"></div>
+    <div class="play" id="stagePlay"></div>
+    <div class="tip" id="tip" hidden>
+      <svg viewBox="0 0 80 80" aria-hidden="true"><use href="#dedehead"/></svg>
+      <div class="bubble" id="tipText" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- 04 故事碎片收藏冊 -->
+  <section class="screen" data-screen="book" hidden>
+    <div><div class="eyebrow">STORY COLLECTION</div><h2 style="font-size:24px">故事碎片收藏冊</h2></div>
+    <div class="badges" id="badges"></div>
+    <div class="pages" id="pages"></div>
+    <div class="btn-row" id="bookActions"></div>
+    <div style="text-align:center">
+      <button class="danger" id="btnReset">清除進度（交給下一組使用）</button>
+      <div id="resetConfirm" hidden style="display:grid;gap:8px;justify-items:center;margin-top:6px">
+        <p class="note">確定要清除這支手機上的所有進度嗎？完賽畫面也會一起消失。</p>
+        <div class="btn-row"><button class="btn small ghost" id="btnResetNo">取消</button><button class="btn small" id="btnResetYes">確定清除</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 完整故事 -->
+  <section class="screen" data-screen="story" hidden>
+    <div><div class="eyebrow">THE CHRISTMAS STORY BOOK</div><h2 style="font-size:24px">完整的聖誕故事回來了</h2></div>
+    <div class="page deckle" id="fullStory"></div>
+    <div class="btn-row"><button class="btn" id="btnToCert">領取探險家證書</button></div>
+  </section>
+
+  <!-- 06 完賽證書 -->
+  <section class="screen" data-screen="cert" hidden>
+    <div class="page cert" id="cert"></div>
+    <div class="staff" id="staffBox"></div>
+  </section>
+</div>
+
+<div id="overlayRoot"></div>
+
+<script>
+/*
+ * SWSH Christmas Reading Quest — 活動設定檔
+ * 想換地點、密碼、題目或推薦書，只要改這個檔案即可。
+ * index.html（學生遊戲）與 staff.html（工作人員後台）共用這份設定。
+ */
+window.QUEST_CONFIG = {
+  eventName: "四維高中圖書館聖誕週",
+  questName: "聖誕故事失竊事件：DeDe 的最後任務",
+  englishName: "SWSH Christmas Reading Quest",
+  slogan: "今年聖誕節，故事不會自己找到你，你必須親自把它找回來！",
+  targetMinutes: 10,
+
+  // 工作人員核銷用 PIN（請在活動前更改）
+  staffPin: "2512",
+  // 完賽驗證碼用的鹽值（請在活動前改成只有工作人員知道的字串）
+  salt: "dede-xmas-2026",
+
+  // true：每一關都要掃描 QR Code 或輸入地點代碼才能進入
+  requireScan: true,
+
+  // 每個據點：key 會放在 QR Code 網址的 #後面；code 是印在立牌上的備用地點代碼
+  stages: [
+    { id: 1, key: "go-letter-k4", code: "4821", title: "聖誕老人的遺失信件", short: "聖誕信件", place: "圖書館入口", type: "閱讀理解", char: "暖" },
+    { id: 2, key: "go-snowman-p7", code: "1736", title: "雪人的記憶拼圖",   short: "雪人拼圖", place: "圖書館閱讀區", type: "文字重組", char: "愛" },
+    { id: 3, key: "go-reindeer-m2", code: "5290", title: "麋鹿的神祕書單",   short: "神祕書單", place: "圖書館書架區", type: "書籍偵探", char: "讀" },
+    { id: 4, key: "go-cipher-r9",  code: "8063", title: "聖誕密碼研究所",   short: "密碼研究所", place: "圖書館公共空間", type: "邏輯推理", char: "閱" },
+    { id: 5, key: "go-dede-x5",    code: "1225", title: "DeDe 的最後禮物",  short: "DeDe 終極任務", place: "圖書館聖誕樹旁", type: "終極任務", char: "★" }
+  ]
+};
+
+/* 完賽驗證碼：學生端與工作人員端用同一個函式計算（FNV-1a 雜湊 → 5 碼） */
+window.questCode = function (str) {
+  var h = 0x811c9dc5;
+  for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; }
+  var A = "ACDEFHJKLMNPRTUVWXY34679", out = "";
+  for (var j = 0; j < 5; j++) { out += A[h % A.length]; h = Math.floor(h / A.length) + (j * 7919); }
+  return out;
+};
+
+</script>
+<script>
+(function () {
+"use strict";
+const C = window.QUEST_CONFIG;
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const NUM = ["", "一", "二", "三", "四", "五"];
+
+/* ================= 故事內容（閱讀材料） ================= */
+const PROLOGUE = [
+  "平安夜即將到來，圖書館裡原本準備了一本神祕的《聖誕故事書》。",
+  "沒想到，一場突如其來的暴風雪，讓故事書的五個重要篇章全部消失了！",
+  "圖書館的小小守護者 DeDe 發現，這些故事碎片被藏在圖書館的不同角落。",
+  "現在，DeDe 需要你的幫忙。只要完成五項閱讀挑戰，找回五個故事碎片，就能重新拼湊出完整的聖誕故事，解開最後的聖誕驚喜。"
+];
+const CONTENT = {
+  1: {
+    lead: "聖誕老人留下一封信，信中藏著一個關於聖誕節的祕密。",
+    frag: { title: "第一章　雪夜的來信", text: "平安夜前一晚，圖書館的燈還亮著。DeDe 在還書箱裡發現一封蓋著雪花郵戳的信，信封上寫著：「給願意停下腳步的人。」" },
+    book: { title: "聖誕頌歌", author: "狄更斯", note: "小氣的史古基在聖誕夜遇見三個幽靈，終於學會分享與溫暖。", color: "#2E5B45" }
+  },
+  2: {
+    lead: "雪人把一段聖誕祝福弄亂了，請幫忙恢復原貌！",
+    frag: { title: "第二章　雪人的祝福", text: "雪人把自己的紅圍巾解下來，圍在怕冷的小麻雀身上。「分享不會讓我變少，」雪人笑著說，「只會讓冬天變短一點。」" },
+    book: { title: "雪人", author: "雷蒙．布力格", note: "一本沒有文字的繪本，只用圖畫就說完一個冬夜的友誼。", color: "#6E8EA6" }
+  },
+  3: {
+    lead: "麋鹿老師的書單遺失了，只剩下三張線索卡。",
+    frag: { title: "第三章　麋鹿的書單", text: "麋鹿老師有一本翻到起毛邊的《小王子》。他每年聖誕節都會重讀一次，因為書裡的狐狸提醒他：真正重要的東西，要用心去看。" },
+    book: { title: "小王子", author: "聖修伯里", note: "「真正重要的東西，用眼睛是看不見的。」到書架區找找看這本書的實體封面。", color: "#C79A3B" }
+  },
+  4: {
+    lead: "聖誕老人留下了一組英文字母密碼，只有細心的人才能解開。",
+    frag: { title: "第四章　密碼的答案", text: "聖誕老人的密碼本最後一頁，只寫了四個字母：READ。原來打開聖誕魔法的鑰匙，一直都放在圖書館的書架上。" },
+    book: { title: "福爾摩斯探案：跳舞的人", author: "柯南．道爾", note: "一排排跳舞小人的塗鴉，其實是一套密碼。換你當偵探！", color: "#3B2F2A" }
+  },
+  5: {
+    lead: "DeDe 終於找到你了！牠帶著最後一份禮物，但禮物盒上有一道鎖。",
+    frag: { title: "第五章　DeDe 的最後禮物", text: "五片故事回到書裡，書頁一頁一頁亮了起來。DeDe 把禮物盒推到你面前，裡面沒有玩具，只有一張書籤，上面寫著：「閱讀讓愛與溫暖延續。」" },
+    book: { title: "麥琪的禮物", author: "歐．亨利", note: "一對貧窮的夫妻，各自賣掉最珍貴的東西，為對方準備聖誕禮物。", color: "#C23A2E" }
+  }
+};
+
+/* ================= 狀態 ================= */
+const KEY = "swsh-xmas-quest-v1";
+const fresh = () => ({ team: "", startedAt: 0, unlocked: {}, done: {}, finishedAt: 0, code: "", redeemedAt: 0, demo: false, mute: false, badge4: false });
+let S = fresh();
+try { const raw = localStorage.getItem(KEY); if (raw) S = Object.assign(fresh(), JSON.parse(raw)); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+
+const stage = (id) => C.stages.find((s) => s.id === id);
+const isDone = (id) => !!S.done[id];
+const doneCount = () => C.stages.filter((s) => isDone(s.id)).length;
+const firstFourDone = () => [1, 2, 3, 4].every(isDone);
+const isUnlocked = (id) => !C.requireScan || S.demo || !!S.unlocked[id] || isDone(id);
+let pendingStage = 0;
+
+/* ================= 畫面切換 ================= */
+function show(name) {
+  document.querySelectorAll(".screen").forEach((el) => { el.hidden = el.dataset.screen !== name; });
+  $("#topbar").hidden = ["home", "prologue"].includes(name);
+  if (name === "map") renderMap();
+  if (name === "book") renderBook();
+  if (name === "story") renderStory();
+  if (name === "cert") renderCert();
+  if (name === "home") renderHome();
+  updateBar();
+  window.scrollTo({ top: 0, behavior: "instant" in window ? "instant" : "auto" });
+}
+
+function updateBar() {
+  $("#teamName").textContent = S.team || "";
+  $("#fragDots").innerHTML = C.stages.map((s) => `<span class="${isDone(s.id) ? "on" : ""} ${s.id === 5 ? "final" : ""}">${isDone(s.id) ? esc(s.char) : ""}</span>`).join("");
+  $("#soundWave").style.opacity = S.mute ? 0 : 1;
+  tick();
+}
+function fmt(ms) { const t = Math.max(0, Math.floor(ms / 1000)); return String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0"); }
+function tick() {
+  if (!S.startedAt) return;
+  const ms = (S.finishedAt || Date.now()) - S.startedAt;
+  const el = $("#timer"); el.textContent = fmt(ms);
+  el.classList.toggle("over", ms > C.targetMinutes * 60000 && !S.finishedAt);
+}
+setInterval(tick, 1000);
+
+function toast(msg, ms = 2800) {
+  const t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), ms);
+}
+
+/* ================= 首頁 ================= */
+function renderHome() {
+  $("#eventName").textContent = C.eventName;
+  $("#slogan").textContent = "「" + C.slogan + "」";
+  $("#enName").textContent = C.englishName;
+  const b = $("#pendingBanner");
+  if (pendingStage) { b.hidden = false; b.innerHTML = `你掃到了 <b>第${NUM[pendingStage]}關｜${esc(stage(pendingStage).short)}</b>！先建立小隊，就會直接帶你進入關卡。`; }
+  else b.hidden = true;
+  $("#continueRow").hidden = !S.team;
+  $("#btnStart").textContent = S.team ? "看序章" : "開始冒險";
+}
+$("#btnStart").onclick = () => { audio.unlock(); renderPrologue(); show("prologue"); };
+$("#btnContinue").onclick = () => { audio.unlock(); show(S.finishedAt ? "cert" : "map"); };
+
+function renderPrologue() {
+  $("#prologueText").innerHTML = PROLOGUE.map((p, i) => `<p class="${i === 0 ? "drop" : ""}">${esc(p)}</p>`).join("");
+  if (S.team) { $("#teamInput").value = S.team; }
+}
+$("#teamForm").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const name = $("#teamInput").value.trim();
+  if (!name) { $("#teamErr").textContent = "請先輸入小隊名稱，證書上會用到喔。"; $("#teamInput").focus(); return; }
+  $("#teamErr").textContent = "";
+  const isNew = !S.team;
+  S.team = name; if (!S.startedAt) S.startedAt = Date.now();
+  save(); audio.play("start");
+  if (pendingStage) { const id = pendingStage; pendingStage = 0; S.unlocked[id] = true; save(); openStage(id); return; }
+  show("map");
+  if (isNew) toast("計時開始！先到第一關：" + stage(1).place);
+});
+
+/* ================= 地圖 ================= */
+const NODES = { 1: [84, 478, "r"], 2: [270, 392, "l"], 3: [92, 300, "r"], 4: [270, 210, "l"], 5: [180, 104, "t"] };
+function renderMap() {
+  const svg = $("#mapSvg");
+  const path = "M84 478 C 170 478, 270 456, 270 392 S 92 352, 92 300 S 270 266, 270 210 S 180 160, 180 104";
+  const tree = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 -26 L14 0 H-14Z M0 -16 L17 10 H-17Z" fill="#2E5B45" opacity=".85"/><rect x="-3" y="10" width="6" height="7" fill="#8A4A2B"/></g>`;
+  let h = `
+    <g fill="#FFFDF8">${Array.from({ length: 26 }, (_, i) => `<circle cx="${(i * 97) % 350 + 5}" cy="${(i * 211) % 540 + 10}" r="${1.5 + (i % 3)}" opacity=".9"/>`).join("")}</g>
+    ${tree(30, 380, .9)}${tree(330, 300, 1)}${tree(320, 500, .8)}${tree(30, 200, .8)}${tree(330, 120, .9)}${tree(36, 70, .7)}
+    <path d="${path}" fill="none" stroke="#E7DCCB" stroke-width="16" stroke-linecap="round"/>
+    <path d="${path}" fill="none" stroke="#C79A3B" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round"/>
+    <g transform="translate(40 530)"><rect x="-26" y="-18" width="52" height="24" rx="12" fill="#3B2F2A"/><text x="0" y="-1" text-anchor="middle" font-size="11" font-weight="700" fill="#FFF8EF" font-family="Noto Sans TC, sans-serif">START</text></g>
+  `;
+  let current = 0;
+  C.stages.forEach((s) => { if (!current && !isDone(s.id)) current = s.id; });
+  C.stages.forEach((s) => {
+    const [x, y, side] = NODES[s.id];
+    const done = isDone(s.id), locked5 = s.id === 5 && !firstFourDone();
+    const ready = !done && !locked5 && s.id === current;
+    const fill = done ? (s.id === 5 ? "#C79A3B" : "#2E5B45") : ready ? "#C23A2E" : "#FFFDF8";
+    const fg = done || ready ? "#FFF8EF" : "#B9AA97";
+    const label = done ? s.char : String(s.id);
+    const tx = side === "r" ? x + 40 : side === "l" ? x - 40 : x;
+    const anchor = side === "r" ? "start" : side === "l" ? "end" : "middle";
+    const ty = side === "t" ? y - 50 : y - 4;
+    h += `<g class="node ${ready ? "ready" : ""}" data-id="${s.id}" tabindex="0" role="button" aria-label="第${NUM[s.id]}關 ${esc(s.title)}，${done ? "已完成" : locked5 ? "尚未開放" : "前往"}">
+      <circle class="ring" cx="${x}" cy="${y}" r="34" fill="none" stroke="${ready ? "#C23A2E" : "transparent"}" stroke-width="3"/>
+      <circle cx="${x}" cy="${y}" r="27" fill="${fill}" stroke="${done || ready ? "none" : "#D9CBB5"}" stroke-width="2.5" stroke-dasharray="${done || ready ? "0" : "5 4"}"/>
+      <text x="${x}" y="${y + 8}" text-anchor="middle" font-size="${done ? 24 : 20}" font-weight="700" fill="${fg}" font-family="LXGW WenKai TC, serif">${esc(label)}</text>
+      ${locked5 ? `<g transform="translate(${x + 16} ${y + 12})"><circle r="10" fill="#3B2F2A"/><rect x="-5" y="-2" width="10" height="8" rx="2" fill="#FFF8EF"/><path d="M-3 -2v-3a3 3 0 0 1 6 0v3" stroke="#FFF8EF" stroke-width="1.8" fill="none"/></g>` : ""}
+      <text x="${tx}" y="${ty}" text-anchor="${anchor}" font-size="15" font-weight="700" fill="#3B2F2A" font-family="LXGW WenKai TC, serif">${esc(s.short)}</text>
+      <text x="${tx}" y="${ty + 18}" text-anchor="${anchor}" font-size="11.5" fill="#7A6A60" font-family="Noto Sans TC, sans-serif">${esc(s.place)}</text>
+    </g>`;
+    if (s.id === current && !S.finishedAt) h += `<use href="#dede" x="${side === "l" ? x - 120 : x + 28}" y="${y + 14}" width="80" height="47" opacity=".95"/>`;
+  });
+  svg.innerHTML = h;
+  svg.querySelectorAll(".node").forEach((n) => {
+    const go = () => openStage(+n.dataset.id);
+    n.addEventListener("click", go);
+    n.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+  });
+  $("#doneCount").textContent = doneCount();
+  const tip = $("#mapTip");
+  if (S.finishedAt) tip.textContent = "五片故事都找回來了！點右上角的書本可以重讀完整故事。";
+  else if (current === 5) tip.textContent = "四個通關字到齊！前往" + stage(5).place + "，DeDe 在那裡等你。";
+  else tip.textContent = `下一站：第${NUM[current]}關，請到「${stage(current).place}」掃描 QR Code。`;
+}
+
+/* ================= 進入關卡 ================= */
+function openStage(id) {
+  const s = stage(id);
+  if (isDone(id)) { openReward(id, S.done[id].stars, true); return; }
+  if (!isUnlocked(id)) { openScanSheet(id); return; }
+  if (!S.team) { pendingStage = id; show("home"); return; }
+  S.unlocked[id] = true; save();
+  $("#stageHead").innerHTML = `
+    <div class="chips"><span class="chip red">第${NUM[id]}關</span><span class="chip">${esc(s.type)}</span>
+      <span class="chip plain"><svg width="11" height="11" style="vertical-align:-1px;color:var(--green)"><use href="#pin"/></svg> ${esc(s.place)}</span></div>
+    <h2>${esc(s.title)}</h2>
+    <p class="lead">${esc(CONTENT[id].lead)}</p>`;
+  const play = $("#stagePlay"); play.innerHTML = "";
+  $("#tip").hidden = true;
+  show("stage");
+  STAGES[id](play, (stars) => finishStage(id, stars));
+}
+
+function setTip(html) {
+  const t = $("#tip"); t.hidden = false; $("#tipText").innerHTML = html;
+  t.classList.remove("pop"); void t.offsetWidth; t.classList.add("pop");
+}
+function shake(el) { el.classList.remove("shake"); void el.offsetWidth; el.classList.add("shake"); }
+
+function openScanSheet(id) {
+  const s = stage(id);
+  const locked5 = id === 5 && !firstFourDone();
+  const ov = overlay(`
+    <div class="modal sheet">
+      <div class="pin"><svg width="28" height="28" style="color:var(--green)"><use href="#pin"/></svg></div>
+      <h3>第${NUM[id]}關｜${esc(s.short)}</h3>
+      <p>請到 <b>${esc(s.place)}</b> 找到 DeDe 的 QR Code 立牌，用手機相機掃描就能開啟關卡。</p>
+      ${locked5 ? `<p class="note">提醒：要先集滿前四個通關字，最後一關才會開放。</p>` : ""}
+      <form id="codeForm" style="display:grid;gap:8px;text-align:left" novalidate>
+        <label class="field" for="placeCode">掃不到？輸入立牌上的地點代碼
+          <input class="input" id="placeCode" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="4 位數字" style="text-align:center;letter-spacing:.4em">
+        </label>
+        <p class="err" id="codeErr"></p>
+        <div class="btn-row"><button type="button" class="btn ghost small" data-close>回地圖</button><button class="btn small green" type="submit">打開關卡</button></div>
+      </form>
+    </div>`);
+  $("#codeForm", ov).addEventListener("submit", (e) => {
+    e.preventDefault();
+    const v = $("#placeCode", ov).value.trim();
+    if (v === s.code) { S.unlocked[id] = true; save(); closeOverlay(); openStage(id); }
+    else { $("#codeErr", ov).textContent = "代碼不對喔，看看立牌右下角的 4 位數字。"; shake($("#placeCode", ov)); }
+  });
+}
+
+/* ================= 共用：選擇題 ================= */
+function mcq(el, { q, opts, ans, hints, onDone }) {
+  const box = document.createElement("div"); box.className = "play";
+  box.innerHTML = `<p class="q">${esc(q)}</p><div class="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}"><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("")}</div>`;
+  el.appendChild(box);
+  let wrong = 0;
+  box.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
+    const i = +b.dataset.i;
+    if (i === ans) {
+      b.classList.add("right"); box.querySelectorAll(".opt").forEach((x) => (x.disabled = true));
+      audio.play("ok"); setTimeout(() => onDone(wrong), 650);
+    } else {
+      b.classList.add("wrong"); b.disabled = true; shake(b); audio.play("no");
+      setTip(hints[Math.min(wrong, hints.length - 1)]); wrong++;
+    }
+  }));
+  box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  return box;
+}
+const starsFor = (wrong) => (wrong === 0 ? 3 : wrong === 1 ? 2 : 1);
+
+/* ================= 五個關卡 ================= */
+const STAGES = {
+  /* 01 聖誕信件：拆信 → 閱讀 → 理解題 */
+  1(el, done) {
+    el.innerHTML = `
+      <button class="envelope-btn" id="env" aria-label="打開信封">
+        <svg viewBox="0 0 300 200" aria-hidden="true">
+          <rect x="10" y="40" width="280" height="150" rx="10" fill="#FFFDF8" stroke="#E7DCCB" stroke-width="2"/>
+          <rect x="18" y="48" width="264" height="134" rx="6" fill="none" stroke="#C23A2E" stroke-width="6" stroke-dasharray="14 8"/>
+          <path d="M10 190 L150 110 L290 190" fill="#F6EEDF" stroke="#E7DCCB" stroke-width="2"/>
+          <g class="flap"><path d="M10 40 L150 128 L290 40Z" fill="#F1E6D2" stroke="#E7DCCB" stroke-width="2"/></g>
+          <rect x="226" y="60" width="44" height="52" rx="3" fill="#DCE8DF" stroke="#2E5B45" stroke-width="2" stroke-dasharray="3 3"/>
+          <path d="M248 70 L260 96 H236Z" fill="#2E5B45"/>
+          <text x="40" y="168" font-size="15" fill="#3B2F2A" font-family="LXGW WenKai TC, serif">To: 四維探險家</text>
+          <g class="seal"><circle cx="150" cy="126" r="22" fill="#C23A2E"/><circle cx="150" cy="126" r="16" fill="none" stroke="#9E2B22" stroke-width="2"/><use href="#flake" x="139" y="115" width="22" height="22" style="color:#FFF8EF"/></g>
+        </svg>
+        <span class="hint-line" id="envHint">點一下紅色封蠟，打開聖誕老人的信</span>
+      </button>`;
+    const env = $("#env", el);
+    env.addEventListener("click", () => {
+      if (env.classList.contains("open")) return;
+      env.classList.add("open"); audio.play("paper"); $("#envHint", el).textContent = "";
+      setTimeout(() => {
+        const letter = document.createElement("div"); letter.className = "letter";
+        letter.innerHTML = `<p>親愛的四維探險家：</p>
+          <p>每年聖誕節，我都會收到許多禮物清單。但今年，我最想收到的禮物，並不是昂貴的物品。</p>
+          <p>我希望每個人都能在忙碌的生活中，停下腳步，讀一個故事、聽一段分享，或對身邊的人說一句溫暖的話。</p>
+          <p>因為真正珍貴的禮物，不一定裝在盒子裡，而是藏在人與人之間的心意。</p>
+          <p class="sign">聖誕老人　敬上</p>`;
+        env.after(letter);
+        setTimeout(() => mcq(el, {
+          q: "讀完信，聖誕老人認為最珍貴的禮物是什麼？",
+          opts: ["人與人之間的關懷與心意", "越昂貴的禮物越好", "越大的禮物越有誠意", "每個人都要準備禮物"],
+          ans: 0,
+          hints: ["再讀一次信的<b>最後一段</b>：真正珍貴的禮物「藏在」哪裡呢？", "信裡說，禮物<b>不一定裝在盒子裡</b>喔！"],
+          onDone: (w) => { $("p:nth-child(4)", letter).innerHTML = "因為真正珍貴的禮物，不一定裝在盒子裡，而是<mark>藏在人與人之間的心意</mark>。"; done(starsFor(w)); }
+        }), 700);
+      }, 550);
+    });
+    setTip("聖誕老人的信藏著第一個祕密。<b>仔細讀</b>，答案就在字裡行間！");
+  },
+
+  /* 02 雪人拼圖：排詞語 → 核心價值 */
+  2(el, done) {
+    const words = ["分享", "讓", "世界", "更溫暖"];
+    let order = shuffle([0, 1, 2, 3]); while (order.join() === "0,1,2,3") order = shuffle(order);
+    const placed = [];
+    let wrong = 0;
+    el.innerHTML = `
+      <div class="art"><svg viewBox="0 0 200 210" aria-hidden="true">
+        <circle cx="100" cy="160" r="46" fill="#FFFDF8" stroke="#DCE8EE" stroke-width="3"/>
+        <circle cx="100" cy="88" r="36" fill="#FFFDF8" stroke="#DCE8EE" stroke-width="3"/>
+        <path d="M62 112 Q100 128 138 112 L136 124 Q100 138 64 124Z" fill="#C23A2E"/><rect x="118" y="118" width="14" height="34" rx="4" fill="#C23A2E" transform="rotate(-10 125 135)"/>
+        <path d="M66 62 Q100 8 138 54 Q100 46 66 62Z" fill="#C23A2E"/><rect x="62" y="56" width="78" height="12" rx="6" fill="#FFF8EF" stroke="#E7DCCB"/><circle cx="140" cy="38" r="8" fill="#FFF8EF" stroke="#E7DCCB"/>
+        <circle cx="88" cy="84" r="4" fill="#3B2F2A"/><circle cx="112" cy="84" r="4" fill="#3B2F2A"/>
+        <path d="M100 92 L128 98 L100 100Z" fill="#E58A3A"/>
+        <circle cx="100" cy="150" r="4" fill="#C23A2E"/><circle cx="100" cy="168" r="4" fill="#C23A2E"/>
+        <path d="M56 140 L22 112 M146 140 L178 108" stroke="#8A4A2B" stroke-width="5" stroke-linecap="round"/>
+      </svg></div>
+      <p class="q">挑戰一：點選下方詞語，排成一句通順的聖誕祝福</p>
+      <div class="slots" id="slots">${[0, 1, 2, 3].map((i) => `<button class="slot" data-s="${i}" aria-label="第${i + 1}格"></button>`).join("")}</div>
+      <div class="tiles" id="tiles">${order.map((w, k) => `<button class="tile" data-w="${w}" style="--rot:${[-4, 3, -2, 4][k]}deg">${words[w]}</button>`).join("")}</div>`;
+    const slots = $("#slots", el), tiles = $("#tiles", el);
+    const paint = () => slots.querySelectorAll(".slot").forEach((sl, i) => { sl.textContent = placed[i] != null ? words[placed[i]] : ""; sl.classList.toggle("filled", placed[i] != null); });
+    tiles.addEventListener("click", (e) => {
+      const t = e.target.closest(".tile"); if (!t || t.classList.contains("used")) return;
+      const idx = placed.findIndex((p) => p == null); const pos = idx === -1 ? placed.length : idx;
+      if (pos > 3) return;
+      placed[pos] = +t.dataset.w; t.classList.add("used"); audio.play("tap"); paint();
+      if (placed.filter((p) => p != null).length === 4) check();
+    });
+    slots.addEventListener("click", (e) => {
+      const sl = e.target.closest(".slot"); if (!sl || slots.classList.contains("good")) return;
+      const i = +sl.dataset.s; if (placed[i] == null) return;
+      tiles.querySelector(`[data-w="${placed[i]}"]`).classList.remove("used"); placed[i] = null; paint();
+    });
+    function check() {
+      if (placed.join() === "0,1,2,3") {
+        slots.classList.add("good"); audio.play("ok");
+        setTip("雪人的祝福回來了：「<b>分享讓世界更溫暖</b>」！");
+        setTimeout(() => mcq(el, {
+          q: "挑戰二：這句祝福想傳達的核心價值是什麼？",
+          opts: ["比誰收到的禮物比較多", "分享與關懷", "冬天一定要待在室內", "把溫暖留給自己"],
+          ans: 1,
+          hints: ["想想看，句子是從哪個動作開始的？", "雪人說：「<b>分享</b>不會讓我變少。」"],
+          onDone: (w2) => done(Math.max(1, starsFor(wrong + w2)))
+        }), 600);
+      } else {
+        wrong++; audio.play("no"); shake(slots);
+        setTip(wrong === 1 ? "嗯⋯讀起來怪怪的。誰<b>先做什麼</b>，才<b>讓</b>世界變得怎麼樣？" : "提示：第一個詞是「<b>分享</b>」。");
+        setTimeout(() => { placed.length = 0; tiles.querySelectorAll(".tile").forEach((t) => t.classList.remove("used")); paint(); }, 700);
+      }
+    }
+    setTip("雪人太冷了，把祝福摔成了四塊。幫它<b>按照順序</b>拼回去！");
+  },
+
+  /* 03 神祕書單：翻線索卡 → 從書架抽出正確的書 */
+  3(el, done) {
+    const clues = ["主角是一位來自外星球的小男孩。", "他曾經造訪許多不同的星球。", "故事中有狐狸、玫瑰，還有一段關於「馴養」的對話。"];
+    const books = [["老人與海", "#6E8EA6"], ["小王子", "#C79A3B"], ["哈利波特", "#2E5B45"], ["夏洛的網", "#C23A2E"]];
+    let flipped = 0, wrong = 0;
+    el.innerHTML = `
+      <p class="q">翻開線索卡，再從書架上抽出麋鹿老師的書。翻越少張就猜中，得到的雪花越多！</p>
+      <div class="clues">${clues.map((c, i) => `<button class="clue" data-i="${i}" aria-label="翻開線索 ${i + 1}"><div class="in">
+        <div class="face front"><span class="n">${i + 1}</span>線索卡<i>點我翻開</i></div>
+        <div class="face back"><span class="n">${i + 1}</span>${esc(c)}</div></div></button>`).join("")}</div>
+      <div class="shelf locked" id="shelf">${books.map((b, i) => `<button class="spine" data-i="${i}" style="background:${b[1]}">${b[0]}</button>`).join("")}</div>
+      <p class="note" style="text-align:center">麋鹿老師的書架</p>`;
+    el.querySelectorAll(".clue").forEach((c) => c.addEventListener("click", () => {
+      if (c.classList.contains("flipped")) return;
+      const i = +c.dataset.i;
+      if (i !== flipped) { setTip("線索要<b>依照順序</b>翻開喔！"); shake(c); return; }
+      c.classList.add("flipped"); flipped++; audio.play("paper");
+      $("#shelf", el).classList.remove("locked");
+      if (flipped === 1) setTip("已經有頭緒了嗎？可以直接到書架抽書，或再翻下一張。");
+    }));
+    $("#shelf", el).addEventListener("click", (e) => {
+      const b = e.target.closest(".spine"); if (!b || b.disabled) return;
+      if (+b.dataset.i === 1) {
+        b.classList.add("right"); el.querySelectorAll(".spine").forEach((x) => (x.disabled = true)); audio.play("ok");
+        el.querySelectorAll(".clue").forEach((c) => c.classList.add("flipped"));
+        setTip("就是《<b>小王子</b>》！去書架區找找它的實體封面吧。");
+        const stars = Math.max(1, 4 - flipped - wrong);
+        setTimeout(() => done(stars), 1100);
+      } else {
+        b.classList.add("wrong"); b.disabled = true; wrong++; audio.play("no");
+        setTip(flipped < 3 ? "不是這本喔。要不要<b>再翻一張線索</b>？" : "注意「狐狸」和「玫瑰」，是哪本書呢？");
+      }
+    });
+    setTip("麋鹿老師最愛的書不見了！先翻開<b>第一張</b>線索卡。");
+  },
+
+  /* 04 密碼研究所：數字 → 字母 */
+  4(el, done) {
+    const nums = [18, 5, 1, 4], target = "READ";
+    let input = "", wrong = 0;
+    el.innerHTML = `
+      <div class="baubles" aria-label="密碼 18 5 1 4">${nums.map((n, i) => `<div class="bauble" style="background:${["#C23A2E", "#2E5B45", "#C79A3B", "#6E8EA6"][i]}">${n}</div>`).join("")}</div>
+      <p class="q" style="text-align:center">已知 A=1、B=2、C=3⋯⋯Z=26，請破解這四顆聖誕球</p>
+      <div class="answer" id="ans"><span></span><span></span><span></span><span></span></div>
+      <div class="keys" id="keys">${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c) => `<button class="key" data-k="${c}">${c}</button>`).join("")}<button class="key wide" data-k="del" aria-label="刪除">⌫ 刪除</button></div>
+      <details class="cb"><summary>打開密碼對照表</summary>
+        <div class="codebook">${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").map((c, i) => `<div><b>${c}</b>${i + 1}</div>`).join("")}</div>
+      </details>`;
+    const ans = $("#ans", el);
+    const paint = () => ans.querySelectorAll("span").forEach((s, i) => { s.textContent = input[i] || ""; s.classList.toggle("cur", i === input.length); });
+    paint();
+    $("#keys", el).addEventListener("click", (e) => {
+      const k = e.target.closest(".key"); if (!k || ans.classList.contains("good")) return;
+      if (k.dataset.k === "del") input = input.slice(0, -1);
+      else if (input.length < 4) { input += k.dataset.k; audio.play("tap"); }
+      paint();
+      if (input.length === 4) {
+        if (input === target) {
+          ans.classList.add("good"); audio.play("ok");
+          setTip("<b>READ</b>，閱讀！原來聖誕老人的密碼就是：去讀一本書。");
+          setTimeout(() => done(starsFor(wrong)), 1100);
+        } else {
+          wrong++; audio.play("no"); shake(ans);
+          setTip(wrong === 1 ? "差一點！A 是第 1 個字母，那 <b>18</b> 是第幾個呢？打開下面的密碼表看看。" : "提示：這個英文字和<b>圖書館</b>最有關係。");
+          setTimeout(() => { input = ""; paint(); }, 650);
+        }
+      }
+    });
+    setTip("用下方鍵盤輸入四個英文字母。<b>不會算？</b>最下面有對照表。");
+  },
+
+  /* 05 DeDe 終極任務：選出精神句 → 依序放入通關字開鎖 */
+  5(el, done) {
+    if (!firstFourDone()) {
+      const miss = [1, 2, 3, 4].filter((i) => !isDone(i));
+      el.innerHTML = `<div class="page locked-card">
+        <svg viewBox="0 0 80 80" width="90" aria-hidden="true"><use href="#dedehead"/></svg>
+        <h3>禮物盒還鎖著</h3>
+        <p>要集滿四個通關字才能打開。你還缺這幾關：</p>
+        <div class="missing">${miss.map((i) => `<span class="chip red">第${NUM[i]}關｜${esc(stage(i).short)}</span>`).join("")}</div>
+        <button class="btn green" id="backMap">回冒險地圖</button></div>`;
+      $("#backMap", el).onclick = () => show("map");
+      return;
+    }
+    const chars = [1, 2, 3, 4].map((i) => stage(i).char); // 暖 愛 讀 閱
+    el.innerHTML = `
+      <div class="gift" id="gift"><svg viewBox="0 0 240 230" aria-hidden="true">
+        <g class="pup"><use href="#dedehead" x="70" y="40" width="100" height="100"/></g>
+        <rect x="40" y="100" width="160" height="120" rx="8" fill="#2E5B45"/>
+        <rect x="110" y="100" width="20" height="120" fill="#C23A2E"/>
+        <g class="lid"><rect x="30" y="76" width="180" height="30" rx="6" fill="#3A6E55"/><rect x="110" y="76" width="20" height="30" fill="#C23A2E"/>
+          <path d="M120 76 C 90 40, 70 70, 118 76 M120 76 C 150 40, 170 70, 122 76" stroke="#C23A2E" stroke-width="9" fill="none" stroke-linecap="round"/></g>
+        <g class="lock"><rect x="100" y="140" width="40" height="34" rx="6" fill="#C79A3B"/><path d="M108 140v-10a12 12 0 0 1 24 0v10" stroke="#C79A3B" stroke-width="6" fill="none"/><circle cx="120" cy="155" r="4" fill="#3B2F2A"/><rect x="118" y="156" width="4" height="9" fill="#3B2F2A"/></g>
+      </svg></div>
+      <p>你帶來的四個通關字：<b style="font-family:var(--font-story);font-size:20px;letter-spacing:.3em;color:var(--green)">${chars.join("、")}</b></p>`;
+    setTip("汪！謝謝你找回四片故事。禮物盒的鎖要用<b>一句話</b>才能打開⋯⋯");
+    mcq(el, {
+      q: "請選出最符合這趟冒險精神的一句話：",
+      opts: ["閱讀讓愛與溫暖延續", "禮物越多越幸福", "聖誕節只要交換禮物", "閱讀是一件很困難的事"],
+      ans: 0,
+      hints: ["回想四個通關字：<b>暖、愛、讀、閱</b>，哪一句全部用上了？", "聖誕老人的信、雪人、麋鹿和密碼，都在說同一件事。"],
+      onDone: (w) => lockStep(w)
+    });
+    function lockStep(w1) {
+      const target = ["閱", "讀", "愛", "暖"];
+      const placed = []; let wrong = 0;
+      const box = document.createElement("div"); box.className = "play";
+      box.innerHTML = `<p class="q">最後一步：把四個通關字，<b>依照它們在句子裡出現的順序</b>放進鎖孔！</p>
+        <div class="lockrow" id="lockrow">${target.map((_, i) => `<div class="slot" aria-label="鎖孔 ${i + 1}"></div>`).join("")}</div>
+        <div class="tiles chars" id="chars">${shuffle(chars.slice()).map((c, k) => `<button class="tile" data-c="${c}" style="--rot:${[-5, 4, -3, 5][k]}deg">${c}</button>`).join("")}</div>`;
+      el.appendChild(box); box.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTip("句子是：「<b>閱讀讓愛與溫暖延續</b>」。照順序放進去！");
+      const row = $("#lockrow", box);
+      $("#chars", box).addEventListener("click", (e) => {
+        const t = e.target.closest(".tile"); if (!t || t.classList.contains("used")) return;
+        placed.push(t.dataset.c); t.classList.add("used"); audio.play("tap");
+        row.querySelectorAll(".slot").forEach((s, i) => { s.textContent = placed[i] || ""; s.classList.toggle("filled", !!placed[i]); });
+        if (placed.length === 4) {
+          if (placed.join() === target.join()) {
+            row.classList.add("good");
+            setTimeout(() => {
+              $("#gift", el).classList.add("open"); audio.play("win"); confetti();
+              $("#gift", el).scrollIntoView({ behavior: "smooth", block: "center" });
+              setTip("<b>喀啦！</b>禮物盒打開了⋯⋯DeDe 跳了出來！");
+              setTimeout(() => done(Math.max(1, starsFor(w1 + wrong))), 1900);
+            }, 350);
+          } else {
+            wrong++; audio.play("no"); shake(row);
+            setTip("順序不對喔！句子從「<b>閱</b>」開始。");
+            setTimeout(() => { placed.length = 0; row.querySelectorAll(".slot").forEach((s) => { s.textContent = ""; s.classList.remove("filled"); }); box.querySelectorAll(".tile").forEach((t) => t.classList.remove("used")); }, 700);
+          }
+        }
+      });
+    }
+  }
+};
+
+/* ================= 完成關卡 & 獎勵卡 ================= */
+function finishStage(id, stars) {
+  if (!S.done[id]) S.done[id] = { stars, at: Date.now() };
+  if (id === 5 && !S.finishedAt) { S.finishedAt = Date.now(); S.code = makeCode(S.team, S.finishedAt); }
+  save(); updateBar();
+  if (id !== 5) { audio.play("win"); confetti(0.45); }
+  openReward(id, stars, false);
+}
+
+function starRow(n) { return `<div class="stars" aria-label="${n} 顆雪花">${[1, 2, 3].map((i) => `<svg style="color:${i <= n ? "var(--gold)" : "var(--line)"}"><use href="#star" fill="currentColor"/></svg>`).join("")}</div>`; }
+
+function openReward(id, stars, viewOnly) {
+  const s = stage(id), c = CONTENT[id];
+  const ov = overlay(`
+    <div class="modal" style="margin-top:56px">
+      <div class="seal-big ${id === 5 ? "gold" : ""}">${esc(s.char)}</div>
+      <p class="eyebrow">${id === 5 ? "最後一片故事" : `第 ${id} 片故事碎片`}</p>
+      <h3>${id === 5 ? "你打開了 DeDe 的禮物！" : `取得通關字「${esc(s.char)}」`}</h3>
+      ${starRow(stars)}
+      <div class="frag"><h4>${esc(c.frag.title)}</h4><p>${esc(c.frag.text)}</p></div>
+      <div class="bookrec"><div class="cover-mini" style="background:${c.book.color}"></div>
+        <div><small>延伸閱讀</small><b>《${esc(c.book.title)}》</b><span class="note">　${esc(c.book.author)}</span><p>${esc(c.book.note)}</p></div></div>
+      <button class="btn ${id === 5 ? "" : "green"}" data-close>${viewOnly ? "關閉" : id === 5 ? "閱讀完整的聖誕故事" : "收進故事書，回地圖"}</button>
+    </div>`, () => {
+      if (viewOnly) return;
+      if (id === 5) { show("story"); return; }
+      show("map");
+      if (firstFourDone() && !S.badge4) { S.badge4 = true; save(); setTimeout(() => toast("獲得徽章「故事收藏家」！最後一關已開放"), 300); }
+    });
+  return ov;
+}
+
+/* ================= overlay ================= */
+let onCloseCb = null;
+function overlay(html, onClose) {
+  closeOverlay(true);
+  const root = $("#overlayRoot");
+  root.innerHTML = `<div class="overlay" role="dialog" aria-modal="true">${html}</div>`;
+  const ov = root.firstElementChild;
+  onCloseCb = onClose || null;
+  ov.addEventListener("click", (e) => { if (e.target.closest("[data-close]")) closeOverlay(); });
+  setTimeout(() => { const f = ov.querySelector("input, [data-close]"); if (f) f.focus({ preventScroll: true }); }, 60);
+  return ov;
+}
+function closeOverlay(silent) {
+  const root = $("#overlayRoot"); if (!root.firstElementChild) return;
+  root.innerHTML = ""; const cb = onCloseCb; onCloseCb = null;
+  if (!silent && cb) cb();
+}
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeOverlay(); });
+
+/* ================= 收藏冊 ================= */
+function renderBook() {
+  const four = firstFourDone(), five = isDone(5);
+  $("#badges").innerHTML = `
+    <div class="badge ${four ? "on" : ""}"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3l17 7v12c0 11-8 19-17 23C15 41 7 33 7 22V10z" fill="#C23A2E"/><rect x="15" y="15" width="18" height="20" rx="2" fill="#FFF8EF"/><path d="M19 21h10M19 25h10M19 29h6" stroke="#2E5B45" stroke-width="2"/></svg>
+      <div><b>初階｜故事收藏家</b><span>集滿前四片故事碎片</span></div></div>
+    <div class="badge ${five ? "on" : ""}"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#star" fill="#C79A3B"/><use href="#dedehead" x="12" y="13" width="24" height="24"/></svg>
+      <div><b>進階｜聖誕閱讀探險家</b><span>完成全部五關</span></div></div>`;
+  $("#pages").innerHTML = C.stages.map((s) => {
+    const got = isDone(s.id), c = CONTENT[s.id];
+    return `<button class="fpage ${got ? "got" : "snowy"} ${s.id === 5 ? "final" : ""}" data-id="${s.id}">
+      <span class="num">${got ? esc(s.char) : s.id}</span>
+      <div><b>${got ? esc(c.frag.title) : `第${NUM[s.id]}章　（被大雪蓋住了）`}</b>
+      <p>${got ? esc(c.frag.text.slice(0, 34)) + "⋯⋯" : `到「${esc(s.place)}」完成${esc(s.short)}，就能找回這一頁。`}</p>
+      ${got ? `<p style="color:var(--gold);font-weight:700;font-size:13px">延伸閱讀《${esc(c.book.title)}》</p>` : ""}</div></button>`;
+  }).join("");
+  $("#pages").querySelectorAll(".fpage").forEach((p) => p.addEventListener("click", () => { const id = +p.dataset.id; if (isDone(id)) openReward(id, S.done[id].stars, true); else openStage(id); }));
+  $("#bookActions").innerHTML = five ? `<button class="btn" id="bRead">重讀完整故事</button><button class="btn green" id="bCert">完賽證書</button>` : `<button class="btn green" id="bMap">回冒險地圖</button>`;
+  const b1 = $("#bRead"), b2 = $("#bCert"), b3 = $("#bMap");
+  if (b1) b1.onclick = () => show("story"); if (b2) b2.onclick = () => show("cert"); if (b3) b3.onclick = () => show("map");
+  $("#resetConfirm").hidden = true;
+}
+$("#btnReset").onclick = () => { $("#resetConfirm").hidden = false; };
+$("#btnResetNo").onclick = () => { $("#resetConfirm").hidden = true; };
+$("#btnResetYes").onclick = () => { const mute = S.mute; S = fresh(); S.mute = mute; save(); pendingStage = 0; show("home"); toast("進度已清除，可以交給下一組了"); };
+
+/* ================= 完整故事 ================= */
+function renderStory() {
+  $("#fullStory").innerHTML = `
+    <div class="chapter"><h3><span>序</span>失竊的故事書</h3>${PROLOGUE.slice(0, 2).map((p) => `<p>${esc(p)}</p>`).join("")}</div>
+    ${[1, 2, 3, 4, 5].map((i) => `<div class="chapter"><h3><span>${esc(stage(i).char)}</span>${esc(CONTENT[i].frag.title.split("　")[1])}</h3><p>${esc(CONTENT[i].frag.text)}</p></div>`).join("")}
+    <p class="moral">閱讀讓愛與溫暖延續</p>`;
+}
+$("#btnToCert").onclick = () => show("cert");
+
+/* ================= 證書 ================= */
+function makeCode(team, ts) {
+  const d = new Date(ts);
+  const stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, "0") + String(d.getDate()).padStart(2, "0") + String(d.getHours()).padStart(2, "0") + String(d.getMinutes()).padStart(2, "0");
+  return window.questCode(team.trim() + "|" + stamp + "|" + C.salt);
+}
+function fmtDate(ts) { const d = new Date(ts); return `${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; }
+function renderCert() {
+  if (!S.finishedAt) { show("map"); return; }
+  const total = C.stages.reduce((a, s) => a + (S.done[s.id] ? S.done[s.id].stars : 0), 0);
+  $("#cert").innerHTML = `
+    <svg class="rosette" viewBox="0 0 120 130" aria-hidden="true">
+      <path d="M40 84 L28 128 L44 118 L52 132 L60 92Z M80 84 L92 128 L76 118 L68 132 L60 92Z" fill="#2E5B45"/>
+      <circle cx="60" cy="60" r="50" fill="#C79A3B"/>
+      <circle cx="60" cy="60" r="50" fill="none" stroke="#FFF8EF" stroke-width="3" stroke-dasharray="4 5"/>
+      <circle cx="60" cy="60" r="38" fill="#FFF8EF"/>
+      <use href="#dedehead" x="26" y="24" width="68" height="68"/>
+    </svg>
+    <p class="lbl">ADVENTURE CERTIFICATE</p>
+    <h2>聖誕閱讀探險家</h2>
+    <div class="who">${esc(S.team)}</div>
+    <p style="font-family:var(--font-story);font-size:17px;max-width:22em">完成了 DeDe 的五項閱讀挑戰，找回失竊的聖誕故事，正式成為四維聖誕閱讀探險家！</p>
+    <div class="chars-row">${C.stages.slice(0, 4).map((s) => `<span>${esc(s.char)}</span>`).join("")}</div>
+    <div class="cert-grid">
+      <div><b>${fmt(S.finishedAt - S.startedAt)}</b><span>完成時間</span></div>
+      <div><b>${total}/15</b><span>雪花</span></div>
+      <div><b>${fmtDate(S.finishedAt)}</b><span>完賽時刻</span></div>
+    </div>
+    <p class="note">完賽驗證碼</p>
+    <div class="code">${esc(S.code)}</div>
+    <p style="font-size:15px">請回到 <b>${esc(stage(5).place)}</b>，把這個畫面給工作人員看，兌換聖誕小禮物。</p>
+    ${S.redeemedAt ? `<div class="stamp">已兌換<small>${fmtDate(S.redeemedAt)}</small></div>` : ""}`;
+  $("#cert").style.position = "relative";
+  const sb = $("#staffBox");
+  if (S.redeemedAt) { sb.innerHTML = `<p class="note" style="text-align:center">這張證書已在 ${fmtDate(S.redeemedAt)} 兌換過禮物。謝謝參加！</p>`; }
+  else {
+    sb.innerHTML = `<b style="font-size:14px">工作人員核銷區</b><p class="note">由工作人員輸入核銷 PIN，兌換後證書會蓋上「已兌換」章。</p>
+      <form class="row" id="redeemForm" novalidate><input class="input" id="staffPin" type="password" inputmode="numeric" maxlength="8" placeholder="核銷 PIN" autocomplete="off"><button class="btn small" type="submit">核銷</button></form><p class="err" id="pinErr"></p>`;
+    $("#redeemForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if ($("#staffPin").value.trim() === C.staffPin) { S.redeemedAt = Date.now(); save(); audio.play("ok"); renderCert(); }
+      else { $("#pinErr").textContent = "PIN 不正確。"; shake($("#staffPin")); }
+    });
+  }
+}
+
+/* ================= 小工具 ================= */
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+/* 音效：WebAudio 小鈴聲，第一次點擊後才啟動 */
+const audio = (() => {
+  let ctx = null;
+  const unlock = () => { if (!ctx) { try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {} } if (ctx && ctx.state === "suspended") ctx.resume(); };
+  const note = (f, t, d = 0.35, type = "sine", v = 0.18) => {
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = f; o.connect(g); g.connect(ctx.destination);
+    const s = ctx.currentTime + t; g.gain.setValueAtTime(0, s); g.gain.linearRampToValueAtTime(v, s + 0.01); g.gain.exponentialRampToValueAtTime(0.001, s + d);
+    o.start(s); o.stop(s + d + 0.05);
+  };
+  const SFX = {
+    tap: () => note(880, 0, 0.12, "triangle", 0.08),
+    paper: () => { note(520, 0, 0.1, "triangle", 0.06); note(660, 0.05, 0.12, "triangle", 0.06); },
+    ok: () => { note(784, 0, 0.3); note(1175, 0.09, 0.4); },
+    no: () => note(196, 0, 0.25, "square", 0.05),
+    start: () => [523, 659, 784, 1047].forEach((f, i) => note(f, i * 0.09, 0.4, "sine", 0.14)),
+    win: () => [659, 659, 659, 0, 659, 659, 659, 0, 659, 784, 523, 587, 659].forEach((f, i) => f && note(f, i * 0.13, 0.32, "sine", 0.13))
+  };
+  return { unlock, play(n) { if (S.mute) return; unlock(); if (ctx && SFX[n]) try { SFX[n](); } catch (e) {} } };
+})();
+document.addEventListener("pointerdown", () => audio.unlock(), { once: true });
+$("#btnSound").onclick = () => { S.mute = !S.mute; save(); updateBar(); toast(S.mute ? "音效已關閉" : "音效已開啟", 1400); };
+$("#btnMap").onclick = () => show("map");
+$("#btnBook").onclick = () => show("book");
+
+/* 雪花背景 */
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+(function snow() {
+  const cv = $("#snow"), x = cv.getContext("2d"); let W, H, flakes;
+  const size = () => { const dpr = Math.min(2, window.devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0); };
+  size(); addEventListener("resize", size);
+  flakes = Array.from({ length: reduce ? 24 : 55 }, () => ({ x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 2.6, s: 0.3 + Math.random() * 0.8, p: Math.random() * 6 }));
+  const draw = () => {
+    x.clearRect(0, 0, W, H); x.fillStyle = "rgba(169,194,212,.55)";
+    for (const f of flakes) {
+      if (!reduce) { f.y += f.s; f.p += 0.01; f.x += Math.sin(f.p) * 0.4; if (f.y > H + 5) { f.y = -5; f.x = Math.random() * W; } }
+      x.beginPath(); x.arc(f.x, f.y, f.r, 0, 7); x.fill();
+    }
+    if (!reduce) requestAnimationFrame(draw);
+  };
+  draw();
+})();
+
+/* 彩帶 */
+function confetti(scale = 1) {
+  if (reduce) return;
+  const cv = $("#fx"), x = cv.getContext("2d"), dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = innerWidth, H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; x.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const cols = ["#C23A2E", "#2E5B45", "#C79A3B", "#FFF8EF", "#A9C2D4"];
+  const ps = Array.from({ length: Math.round(140 * scale) }, () => ({ x: W / 2, y: H * 0.45, vx: (Math.random() - 0.5) * 12, vy: -Math.random() * 13 - 4, r: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.3, w: 6 + Math.random() * 6, h: 4 + Math.random() * 4, c: cols[Math.floor(Math.random() * cols.length)] }));
+  let t = 0;
+  (function f() {
+    x.clearRect(0, 0, W, H); t++;
+    for (const p of ps) { p.vy += 0.32; p.vx *= 0.99; p.x += p.vx; p.y += p.vy; p.r += p.vr; x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.fillStyle = p.c; x.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); x.restore(); }
+    if (t < 170) requestAnimationFrame(f); else x.clearRect(0, 0, W, H);
+  })();
+}
+
+/* ================= QR Code 進場 ================= */
+function handleHash() {
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (!h) return false;
+  const clear = () => { try { history.replaceState(null, "", location.pathname + location.search); } catch (e) {} };
+  if (h === "demo") { S.demo = true; save(); clear(); toast("測試模式：所有關卡已解鎖"); renderDemoFlag(); return false; }
+  const s = C.stages.find((x) => x.key === h);
+  if (!s) return false;
+  clear();
+  if (!S.team) { pendingStage = s.id; show("home"); return true; }
+  S.unlocked[s.id] = true; save(); closeOverlay(true); openStage(s.id); return true;
+}
+function renderDemoFlag() { if (S.demo && !$(".demo-flag")) { const d = document.createElement("div"); d.className = "demo-flag"; d.textContent = "測試模式"; document.body.appendChild(d); } }
+addEventListener("hashchange", handleHash);
+
+renderDemoFlag();
+if (!handleHash()) show(S.team ? (S.finishedAt ? "cert" : "map") : "home");
+})();
+</script>
+</body>
+</html>
