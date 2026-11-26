@@ -112,6 +112,7 @@ p { margin: 0; }
 .scene .nod { transform-box: fill-box; transform-origin: 20% 90%; animation: nod 2.6s ease-in-out infinite; }
 @keyframes nod { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(10deg); } 90% { transform: rotate(-4deg); } }
 .scene .sway { transform-box: fill-box; transform-origin: 50% 100%; animation: sway 3.4s ease-in-out infinite alternate; }
+.screen.first { animation: none; }
 @keyframes pagein { from { opacity: .001; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
 /* ---------- buttons ---------- */
@@ -684,7 +685,7 @@ details.cb[open] summary { margin-bottom: 8px; }
   </div>
 
   <!-- 01 首頁 -->
-  <section class="screen" data-screen="home" hidden>
+  <section class="screen first" data-screen="home">
     <div class="cover">
       <div class="lights" aria-hidden="true" style="width:100%"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       <div class="eyebrow" id="eventName"></div>
@@ -1223,23 +1224,6 @@ function renderMap() {
   else tip.textContent = `點地圖上閃紅光的第${NUM[current]}關開始挑戰！`;
 }
 
-/* 聖誕老人到站時喊「Ho Ho Ho!」：先用手機的語音（較像真人），0.6 秒內沒開始說話就改播合成聲 */
-function hoHoHo() {
-  if (S.snd === 2) return;
-  let started = false;
-  try {
-    if ("speechSynthesis" in window && window.SpeechSynthesisUtterance) {
-      const u = new SpeechSynthesisUtterance("Ho, ho, ho!");
-      u.lang = "en-US"; u.pitch = 0.2; u.rate = 0.75; u.volume = 1;
-      const v = speechSynthesis.getVoices().find((x) => /^en/i.test(x.lang) && /male|daniel|fred|alex|google uk english male/i.test(x.name)) || speechSynthesis.getVoices().find((x) => /^en/i.test(x.lang));
-      if (v) u.voice = v;
-      u.onstart = () => { started = true; };
-      speechSynthesis.cancel(); speechSynthesis.speak(u);
-    }
-  } catch (e) {}
-  setTimeout(() => { if (!started) { try { speechSynthesis.cancel(); } catch (e) {} audio.hoho(); } }, 600);
-}
-
 /* 聖誕老人：站在目前關卡上方，過關後沿著小路走到下一關 */
 const SANTA_SVG = `<path id="trail" d="M84 478 C 170 478, 270 456, 270 392 S 92 352, 92 300 S 270 266, 270 210 S 180 166, 180 110" fill="none" stroke="none"/>
 <g id="santa" class="santa" pointer-events="none"><g id="santaFlip"><g class="bodybob">
@@ -1279,7 +1263,7 @@ function moveSanta(target) {
   const say = () => { santa.classList.add("say"); setTimeout(() => santa.classList.remove("say"), 2200); };
   const from = Math.min(S.santaAt || 1, target);
   cancelAnimationFrame(santaAnim);
-  if (from === target || reduce) { place(trailLens[target], 1); S.santaAt = target; save(); if (from !== target) { say(); hoHoHo(); } return; }
+  if (from === target || reduce) { place(trailLens[target], 1); S.santaAt = target; save(); if (from !== target) say(); return; }
   S.santaAt = target; save();
   const a = trailLens[from], b = trailLens[target], dur = 1700 * (target - from);
   let t0 = 0, lastX = null, lastStep = 0, stepN = 0;
@@ -1290,7 +1274,7 @@ function moveSanta(target) {
     const x = trail.getPointAtLength(len).x; const dir = lastX == null ? 1 : Math.sign(x - lastX) || 0; lastX = x;
     place(len, dir);
     if (t - lastStep > 300) { lastStep = t; audio.play(stepN++ % 2 ? "step" : "step2"); }
-    if (u < 1) santaAnim = requestAnimationFrame(stepFn); else { santa.classList.remove("walking"); say(); hoHoHo(); }
+    if (u < 1) santaAnim = requestAnimationFrame(stepFn); else { santa.classList.remove("walking"); say(); audio.play("ok"); }
   };
   setTimeout(() => { santaAnim = requestAnimationFrame(stepFn); }, 450);
 }
@@ -1803,26 +1787,7 @@ const audio = (() => {
     start: () => [523, 659, 784, 1047].forEach((f, i) => note(f, i * 0.09, 0.4, "sine", 0.14)),
     win: () => [659, 659, 659, 0, 659, 659, 659, 0, 659, 784, 523, 587, 659].forEach((f, i) => f && note(f, i * 0.13, 0.32, "sine", 0.13))
   };
-  /* 合成的低沉「Ho Ho Ho」：鋸齒波人聲＋母音共振（o）＋開頭的氣音（h） */
-  const hoho = () => {
-    if (!ctx) return;
-    const noise = ctx.createBuffer(1, ctx.sampleRate * 0.1, ctx.sampleRate), nd = noise.getChannelData(0);
-    for (let i = 0; i < nd.length; i++) nd[i] = (Math.random() * 2 - 1) * (1 - i / nd.length);
-    [0, 0.42, 0.84].forEach((dt, i) => {
-      const t = ctx.currentTime + 0.05 + dt, f0 = [150, 145, 132][i], len = i === 2 ? 0.5 : 0.3;
-      const o = ctx.createOscillator(); o.type = "sawtooth"; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * 0.78, t + len);
-      const vib = ctx.createOscillator(), vg = ctx.createGain(); vib.frequency.value = 6; vg.gain.value = 3; vib.connect(vg); vg.connect(o.frequency);
-      const g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.5, t + 0.05); g.gain.setValueAtTime(0.5, t + len * 0.6); g.gain.exponentialRampToValueAtTime(0.001, t + len);
-      [[480, 4, 1], [820, 6, 0.45], [2600, 8, 0.12]].forEach(([fq, q, v]) => {
-        const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = fq; bp.Q.value = q;
-        const bg = ctx.createGain(); bg.gain.value = v; o.connect(bp); bp.connect(bg); bg.connect(g);
-      });
-      g.connect(ctx.destination); o.start(t); vib.start(t); o.stop(t + len + 0.05); vib.stop(t + len + 0.05);
-      const src = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), ng = ctx.createGain();
-      src.buffer = noise; hp.type = "highpass"; hp.frequency.value = 1200; ng.gain.value = 0.08; src.connect(hp); hp.connect(ng); ng.connect(ctx.destination); src.start(t - 0.06);
-    });
-  };
-  return { unlock, ctx: () => ctx, hoho() { if (S.snd === 2) return; unlock(); try { hoho(); } catch (e) {} }, play(n) { if (S.snd === 2) return; unlock(); if (ctx && SFX[n]) try { SFX[n](); } catch (e) {} } };
+  return { unlock, ctx: () => ctx, play(n) { if (S.snd === 2) return; unlock(); if (ctx && SFX[n]) try { SFX[n](); } catch (e) {} } };
 })();
 
 /* 聖誕音樂：用 WebAudio 即時演奏公版聖誕歌曲（Jingle Bells、We Wish You a Merry Christmas），不需音樂檔 */
@@ -1939,6 +1904,7 @@ addEventListener("hashchange", handleHash);
 
 renderDemoFlag();
 if (!handleHash()) show("home");
+setTimeout(() => $(".screen.first") && $(".screen.first").classList.remove("first"), 0);
 })();
 </script>
 </body>
