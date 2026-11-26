@@ -11,7 +11,7 @@ window.QUEST_CONFIG = {
   targetMinutes: 10,
 
   // 工作人員核銷用 PIN（請在活動前更改）
-  staffPin: "2512",
+  staffPin: "1225",
   // 完賽驗證碼用的鹽值（請在活動前改成只有工作人員知道的字串）
   salt: "dede-xmas-2026",
 

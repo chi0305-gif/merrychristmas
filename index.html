@@ -27,6 +27,8 @@
   --sky-deep: #6E8EA6;
   --dede: #8A4A2B;
   --dede-dark: #5E301B;
+  --night: #173D32;      /* 聖誕夜森林綠：頁面底色 */
+  --night-2: #0E2620;
   --font-story: "LXGW WenKai TC", "Kaiti TC", "BiauKai", "STKaiti", serif;
   --font-ui: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
   --r: 18px;
@@ -34,10 +36,16 @@
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
-html, body { height: 100%; }
+html { background: var(--night-2); }
+body { min-height: 100%; }
 body {
   margin: 0;
-  background: var(--paper);
+  background:
+    radial-gradient(circle at 15% -5%, rgba(199,154,59,.28), transparent 38%),
+    radial-gradient(circle at 100% 35%, rgba(194,58,46,.30), transparent 42%),
+    radial-gradient(circle at 0% 85%, rgba(194,58,46,.22), transparent 40%),
+    linear-gradient(var(--night), var(--night-2));
+  background-color: var(--night-2);
   color: var(--ink);
   font-family: var(--font-ui);
   font-size: 16px;
@@ -60,7 +68,48 @@ p { margin: 0; }
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 12px 40px;
 }
-.screen { display: flex; flex-direction: column; gap: 18px; animation: pagein .45s ease both; }
+.screen {
+  display: flex; flex-direction: column; gap: 18px; animation: pagein .45s ease both;
+  position: relative; background: var(--paper); border-radius: 26px; padding: 26px 14px 22px;
+  box-shadow: 0 0 0 4px rgba(199,154,59,.55), 0 24px 50px rgba(0,0,0,.35);
+}
+/* 拐杖糖條紋 + 冬青葉角飾 */
+.screen::after { content: ""; position: absolute; top: 0; left: 26px; right: 26px; height: 7px; border-radius: 0 0 8px 8px;
+  background: repeating-linear-gradient(-45deg, var(--red) 0 9px, #FFF8EF 9px 18px); }
+.screen::before { content: ""; position: absolute; top: -18px; left: -14px; width: 72px; height: 56px; pointer-events: none; z-index: 2;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 72 56'%3E%3Cpath d='M30 30 C18 34 8 26 4 14 C10 18 14 14 16 10 C20 16 26 14 30 30Z' fill='%232E5B45'/%3E%3Cpath d='M32 28 C34 14 46 6 60 8 C56 12 58 18 62 20 C54 22 52 28 32 28Z' fill='%233A6E55'/%3E%3Ccircle cx='31' cy='31' r='6' fill='%23C23A2E'/%3E%3Ccircle cx='40' cy='34' r='5.5' fill='%23C23A2E'/%3E%3Ccircle cx='34' cy='39' r='5' fill='%239E2B22'/%3E%3Ccircle cx='29' cy='29' r='1.8' fill='%23fff' opacity='.7'/%3E%3C/svg%3E") no-repeat center / contain; }
+/* 彩色燈串 */
+.lights { display: flex; justify-content: space-between; height: 18px; padding: 0 6px; position: relative; pointer-events: none; }
+.lights::before { content: ""; position: absolute; left: 0; right: 0; top: -6px; height: 12px; border-bottom: 1.5px solid #0B1D17; border-radius: 0 0 50% 50% / 0 0 100% 100%; }
+.lights i { position: relative; top: 4px; width: 8px; height: 12px; border-radius: 50% 50% 45% 45%; background: var(--c); box-shadow: 0 0 10px 2px var(--c); animation: twinkle 1.4s ease-in-out infinite alternate; }
+.lights i::before { content: ""; position: absolute; top: -3px; left: 2px; width: 4px; height: 4px; background: #33443D; border-radius: 1px; }
+.lights i:nth-child(4n+1) { --c: #FF5A4E; } .lights i:nth-child(4n+2) { --c: #FFD36B; animation-delay: -.5s; }
+.lights i:nth-child(4n+3) { --c: #5FD38D; animation-delay: -1s; } .lights i:nth-child(4n) { --c: #7CC4FF; animation-delay: -.25s; }
+@keyframes twinkle { from { opacity: .35; box-shadow: none; } to { opacity: 1; } }
+/* 雪橇飛過 */
+@media (prefers-reduced-motion: reduce) { .sleigh { display: none; } }
+.sleigh { position: fixed; top: calc(env(safe-area-inset-top, 0px) + 74px); left: 0; width: 190px; z-index: 25; pointer-events: none;
+  transform: translateX(-240px); animation: fly 26s linear 2s infinite; }
+.sleigh .bob { animation: bob .8s ease-in-out infinite alternate; }
+@keyframes fly { 0% { transform: translate(-240px, 10px); } 26% { transform: translate(calc(100vw + 40px), -26px); } 100% { transform: translate(calc(100vw + 40px), -26px); } }
+@keyframes bob { to { transform: translateY(-5px); } }
+/* 底部雪景 */
+.scene { position: relative; z-index: 1; margin-top: 18px; }
+.scene svg { display: block; width: 100%; height: auto; overflow: visible; }
+.scene .smoke circle { animation: smoke 3.2s ease-in infinite; transform-box: fill-box; transform-origin: center; }
+.scene .smoke circle:nth-child(2) { animation-delay: -1.1s; } .scene .smoke circle:nth-child(3) { animation-delay: -2.2s; }
+@keyframes smoke { from { transform: translateY(0) scale(.6); opacity: .8; } to { transform: translateY(-34px) scale(1.4); opacity: 0; } }
+.scene .glow { animation: glow 2.4s ease-in-out infinite alternate; }
+@keyframes glow { to { opacity: .55; } }
+.scene .blink { animation: twinkle 1s ease-in-out infinite alternate; }
+.scene .blink:nth-of-type(2n) { animation-delay: -.5s; }
+.scene .wave { transform-box: fill-box; transform-origin: 0% 100%; animation: wave 1.2s ease-in-out infinite alternate; }
+@keyframes wave { from { transform: rotate(-12deg); } to { transform: rotate(22deg); } }
+.scene .hop { animation: hop 1.6s ease-in-out infinite; }
+@keyframes hop { 0%, 60%, 100% { transform: translateY(0); } 30% { transform: translateY(-12px) rotate(-6deg); } }
+.scene .nod { transform-box: fill-box; transform-origin: 20% 90%; animation: nod 2.6s ease-in-out infinite; }
+@keyframes nod { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(10deg); } 90% { transform: rotate(-4deg); } }
+.scene .sway { transform-box: fill-box; transform-origin: 50% 100%; animation: sway 3.4s ease-in-out infinite alternate; }
 @keyframes pagein { from { opacity: .001; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 
 /* ---------- buttons ---------- */
@@ -83,21 +132,22 @@ p { margin: 0; }
 .topbar {
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
   display: flex; align-items: center; gap: 10px;
-  background: color-mix(in srgb, var(--paper) 92%, transparent);
-  backdrop-filter: blur(6px);
-  padding: 8px 0; margin-bottom: 4px;
-  border-bottom: 1px dashed var(--line);
+  background: color-mix(in srgb, var(--night-2) 94%, transparent);
+  backdrop-filter: blur(6px); color: #FFF8EF;
+  padding: 8px 12px; margin: 0 0 26px; border-radius: 0 0 18px 18px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
 }
-body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
+.topbar .lights { position: absolute; left: 10px; right: 10px; bottom: -16px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--night-2); }
 .team { font-family: var(--font-story); font-weight: 700; font-size: 17px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
-.team small { display: block; font-family: var(--font-ui); font-weight: 500; font-size: 11px; color: var(--ink-soft); letter-spacing: .08em; line-height: 1.2; }
-.timer { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15px; padding: 4px 10px; border-radius: 999px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); }
-.timer.over { color: var(--red); box-shadow: inset 0 0 0 1.5px var(--red); }
-.iconbtn { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); display: grid; place-items: center; flex: none; }
+.team small { display: block; font-family: var(--font-ui); font-weight: 500; font-size: 11px; color: #E8D6A7; letter-spacing: .08em; line-height: 1.2; }
+.timer { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.1); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.25); }
+.timer.over { color: #FFB3AA; box-shadow: inset 0 0 0 1.5px #FF7A6E; }
+.iconbtn { width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.1); color: #FFF8EF; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.22); display: grid; place-items: center; flex: none; }
 .iconbtn svg { width: 22px; height: 22px; }
 .frag-dots { display: flex; gap: 4px; }
-.frag-dots span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-story); font-size: 12px; font-weight: 700; background: var(--card); color: var(--line); box-shadow: inset 0 0 0 1.5px var(--line); }
-.frag-dots span.on { background: var(--green); color: #FFF8EF; box-shadow: none; }
+.frag-dots span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-story); font-size: 12px; font-weight: 700; background: rgba(255,255,255,.08); color: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.25); }
+.frag-dots span.on { background: #3E8A62; color: #FFF8EF; box-shadow: none; }
 .frag-dots span.on.final { background: var(--gold); }
 @media (max-width: 380px) { .frag-dots { display: none; } }
 
@@ -142,13 +192,22 @@ label.field { display: grid; gap: 6px; font-weight: 700; font-size: 15px; }
 .map-head h2 { font-size: 24px; }
 .progress { font-size: 13px; color: var(--ink-soft); text-align: right; }
 .progress b { font-family: var(--font-story); font-size: 22px; color: var(--green); }
-.mapbox { background: linear-gradient(#EEF3F5, var(--card) 60%); border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
+.mapbox { background: linear-gradient(#CFE0EA, #EEF4F6 40%, #FFFDF8 75%); border-radius: var(--r); box-shadow: inset 0 0 0 1px var(--line); overflow: hidden; }
 .mapbox svg { display: block; width: 100%; height: auto; }
 .node { cursor: pointer; }
 .node:focus-visible { outline: none; }
 .node:focus-visible .ring { stroke: var(--gold); stroke-width: 4; }
 .node.ready .ring { animation: pulse 1.8s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
 @keyframes pulse { 50% { transform: scale(1.12); opacity: .5; } }
+.santa .legs rect { transform-box: fill-box; transform-origin: 50% 0; }
+.santa.walking .legs .l { animation: step .32s ease-in-out infinite alternate; }
+.santa.walking .legs .r { animation: step .32s ease-in-out infinite alternate-reverse; }
+.santa.walking .bodybob { animation: bob .16s ease-in-out infinite alternate; }
+.santa .arm { transform-box: fill-box; transform-origin: 0% 100%; animation: wave 1s ease-in-out infinite alternate; }
+.santa.walking .arm { animation: none; }
+.santa .ho { opacity: 0; transition: opacity .3s; }
+.santa.say .ho { opacity: 1; }
+@keyframes step { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
 .map-tip { font-size: 14px; color: var(--ink-soft); text-align: center; }
 
 /* ---------- stage ---------- */
@@ -423,10 +482,23 @@ details.cb[open] summary { margin-bottom: 8px; }
   </defs>
 </svg>
 
+<svg class="sleigh" viewBox="0 0 220 80" aria-hidden="true"><g class="bob">
+  <path d="M60 52 Q40 40 20 46" stroke="#C79A3B" stroke-width="1.5" fill="none"/>
+  <g transform="translate(2 24)"><ellipse cx="22" cy="20" rx="16" ry="8" fill="#9C5733"/><rect x="10" y="24" width="3" height="12" fill="#6B3820" transform="rotate(25 11 24)"/><rect x="30" y="24" width="3" height="12" fill="#6B3820" transform="rotate(-25 31 24)"/><circle cx="38" cy="10" r="6" fill="#9C5733"/><circle cx="44" cy="11" r="2.6" fill="#FF4D40"/><path d="M35 5 l-3 -8 m2 4 l-5 -1 M40 4 l2 -8 m-1 4 l4 -2" stroke="#6B3820" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>
+  <g transform="translate(52 22)"><ellipse cx="22" cy="20" rx="16" ry="8" fill="#8A4A2B"/><rect x="10" y="24" width="3" height="12" fill="#6B3820" transform="rotate(25 11 24)"/><rect x="30" y="24" width="3" height="12" fill="#6B3820" transform="rotate(-25 31 24)"/><circle cx="38" cy="10" r="6" fill="#8A4A2B"/><circle cx="44" cy="11" r="2.4" fill="#2A1B14"/><path d="M35 5 l-3 -8 m2 4 l-5 -1 M40 4 l2 -8 m-1 4 l4 -2" stroke="#6B3820" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>
+  <path d="M92 46 L118 44" stroke="#C79A3B" stroke-width="1.5"/>
+  <g transform="translate(110 10)">
+    <circle cx="44" cy="22" r="9" fill="#F6CDAE"/><path d="M35 24 Q36 36 44 37 Q52 36 53 24 Q48 29 44 28 Q40 29 35 24Z" fill="#fff"/>
+    <path d="M35 18 Q40 4 52 8 Q60 12 62 20" fill="#C23A2E"/><rect x="34" y="15" width="20" height="5" rx="2.5" fill="#fff"/><circle cx="62" cy="21" r="3.5" fill="#fff"/>
+    <rect x="30" y="34" width="30" height="16" rx="6" fill="#C23A2E"/>
+    <path d="M6 36 H86 Q92 36 90 44 L84 58 H14 Q4 58 6 48Z" fill="#9E2B22"/><path d="M6 36 H86" stroke="#C79A3B" stroke-width="3"/>
+    <rect x="70" y="22" width="16" height="16" rx="3" fill="#2E5B45"/><rect x="76" y="22" width="4" height="16" fill="#C79A3B"/>
+    <path d="M4 66 H92 Q100 66 100 58" stroke="#C79A3B" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M20 58 V66 M76 58 V66" stroke="#C79A3B" stroke-width="3"/>
+  </g></g></svg>
 <div class="wrap" id="app">
 
   <div class="topbar" id="topbar" hidden>
-    <div class="team"><small>探險小隊</small><span id="teamName"></span></div>
+    <div class="team"><small>聖誕探險家</small><span id="teamName"></span></div>
     <div class="frag-dots" id="fragDots" aria-label="故事碎片"></div>
     <div class="timer" id="timer" title="遊戲時間">00:00</div>
     <button class="iconbtn" id="btnMap" aria-label="冒險地圖">
@@ -435,6 +507,7 @@ details.cb[open] summary { margin-bottom: 8px; }
     <button class="iconbtn" id="btnBook" aria-label="故事收藏冊">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5z"/><path d="M12 6v14"/></svg>
     </button>
+    <div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <button class="iconbtn" id="btnSound" aria-label="音效開關">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path id="soundWave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
     </button>
@@ -443,6 +516,7 @@ details.cb[open] summary { margin-bottom: 8px; }
   <!-- 01 首頁 -->
   <section class="screen" data-screen="home" hidden>
     <div class="cover">
+      <div class="lights" aria-hidden="true" style="width:100%"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       <div class="eyebrow" id="eventName"></div>
       <svg class="globe" viewBox="0 0 320 320" role="img" aria-label="戴聖誕帽的臘腸狗 DeDe 坐在打開的故事書上">
         <defs><clipPath id="dome"><circle cx="160" cy="150" r="138"/></clipPath></defs>
@@ -471,7 +545,7 @@ details.cb[open] summary { margin-bottom: 8px; }
       <div class="facts">
         <div><b>5</b><span>個關卡</span></div>
         <div><b>10</b><span>分鐘完成</span></div>
-        <div><b>1–4</b><span>人一組</span></div>
+        <div><b>5</b><span>本推薦書</span></div>
       </div>
       <div class="btn-row"><button class="btn" id="btnStart">開始冒險</button></div>
       <div class="btn-row" id="continueRow" hidden><button class="btn green" id="btnContinue">繼續冒險</button></div>
@@ -487,7 +561,7 @@ details.cb[open] summary { margin-bottom: 8px; }
     <div class="page">
       <h3 style="font-size:20px;margin-bottom:10px">冒險規則</h3>
       <ol class="rules">
-        <li>每組只要一支手機。</li>
+        <li>用自己的班級、座號、姓名登入。</li>
         <li>依照地圖順序闖關，完成一關才會打開下一關。</li>
         <li>讀完故事、解開題目，取得一個「通關字」。</li>
         <li>可以到每關建議的地點去找找相關的書與佈置。</li>
@@ -495,10 +569,19 @@ details.cb[open] summary { margin-bottom: 8px; }
       </ol>
     </div>
     <form class="page" id="teamForm" style="display:grid;gap:12px" novalidate>
-      <label class="field" for="teamInput">幫你們的小隊取個名字
-        <input class="input" id="teamInput" maxlength="12" autocomplete="off" placeholder="例如：205 薑餅人小隊">
+      <h3 style="font-size:20px">探險家登入</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <label class="field" for="clsInput">班級
+          <input class="input" id="clsInput" maxlength="6" autocomplete="off" inputmode="numeric" placeholder="例如 205">
+        </label>
+        <label class="field" for="seatInput">座號
+          <input class="input" id="seatInput" maxlength="2" autocomplete="off" inputmode="numeric" placeholder="例如 12">
+        </label>
+      </div>
+      <label class="field" for="nameInput">姓名
+        <input class="input" id="nameInput" maxlength="10" autocomplete="off" placeholder="例如 王小明">
       </label>
-      <p class="note">可以用暱稱或班級代號，不需要填寫姓名和學號。</p>
+      <p class="note">資料只存在這支手機上，會印在你的探險家證書。</p>
       <p class="err" id="teamErr"></p>
       <button class="btn" type="submit">出發！計時開始</button>
     </form>
@@ -551,6 +634,63 @@ details.cb[open] summary { margin-bottom: 8px; }
     <div class="page cert" id="cert"></div>
     <div class="staff" id="staffBox"></div>
   </section>
+  <div class="scene" aria-hidden="true"><svg viewBox="0 0 400 170">
+    <path d="M0 120 Q70 92 140 112 T270 104 T400 112 V170 H0Z" fill="#DCE8EE"/>
+    <!-- 薑餅屋 -->
+    <g transform="translate(8 36)">
+      <rect x="60" y="4" width="12" height="26" fill="#7A4126"/>
+      <g class="smoke"><circle cx="66" cy="-2" r="5" fill="#fff"/><circle cx="66" cy="-2" r="5" fill="#fff"/><circle cx="66" cy="-2" r="5" fill="#fff"/></g>
+      <rect x="10" y="40" width="84" height="56" rx="4" fill="#B5733E"/>
+      <path d="M2 44 L52 6 L102 44Z" fill="#8A4A2B"/>
+      <path d="M2 44 L52 6 L102 44" stroke="#FFF8EF" stroke-width="5" fill="none" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M14 96 q5 -7 10 0 q5 -7 10 0 q5 -7 10 0 q5 -7 10 0 q5 -7 10 0 q5 -7 10 0 q5 -7 10 0 q5 -7 10 0" stroke="#FFF8EF" stroke-width="3" fill="none"/>
+      <circle cx="34" cy="28" r="4" fill="#FF5A4E"/><circle cx="52" cy="18" r="4" fill="#5FD38D"/><circle cx="70" cy="28" r="4" fill="#FFD36B"/>
+      <rect class="glow" x="18" y="52" width="18" height="16" rx="2" fill="#FFD36B"/><rect class="glow" x="68" y="52" width="18" height="16" rx="2" fill="#FFD36B"/>
+      <path d="M18 60 H36 M27 52 V68 M68 60 H86 M77 52 V68" stroke="#FFF8EF" stroke-width="2"/>
+      <path d="M42 96 V74 a10 10 0 0 1 20 0 V96Z" fill="#C23A2E"/><circle cx="57" cy="84" r="1.8" fill="#FFD36B"/>
+      <path d="M100 96 V72 q0 -8 -7 -8" stroke="#FFF8EF" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M100 96 V72 q0 -8 -7 -8" stroke="#C23A2E" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="3 4"/>
+    </g>
+    <!-- 聖誕樹 -->
+    <g transform="translate(150 28)"><g class="sway">
+      <path d="M24 8 L46 46 H2Z M24 28 L52 76 H-4Z M24 52 L56 104 H-8Z" fill="#2E5B45"/>
+      <rect x="19" y="104" width="10" height="12" fill="#7A4126"/>
+      <path class="blink" d="M24 -6 l3.5 8 8.5 .8 -6.4 5.6 1.9 8.3 -7.5 -4.4 -7.5 4.4 1.9 -8.3 -6.4 -5.6 8.5 -.8z" fill="#FFD36B"/>
+      <circle class="blink" cx="16" cy="40" r="3" fill="#FF5A4E"/><circle class="blink" cx="32" cy="60" r="3" fill="#FFD36B"/><circle class="blink" cx="10" cy="70" r="3" fill="#7CC4FF"/>
+      <circle class="blink" cx="38" cy="88" r="3" fill="#FF5A4E"/><circle class="blink" cx="6" cy="94" r="3" fill="#FFD36B"/><circle class="blink" cx="26" cy="30" r="3" fill="#7CC4FF"/>
+    </g></g>
+    <!-- 雪人 -->
+    <g transform="translate(214 50)">
+      <circle cx="24" cy="72" r="24" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="2"/><circle cx="24" cy="34" r="17" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="2"/>
+      <rect x="10" y="10" width="28" height="5" rx="2" fill="#3B2F2A"/><rect x="14" y="-8" width="20" height="20" rx="2" fill="#3B2F2A"/><rect x="14" y="4" width="20" height="4" fill="#C23A2E"/>
+      <circle cx="18" cy="31" r="2.2" fill="#3B2F2A"/><circle cx="30" cy="31" r="2.2" fill="#3B2F2A"/><path d="M24 36 L36 39 L24 40Z" fill="#E58A3A"/>
+      <path d="M8 48 Q24 56 40 48 L40 54 Q24 62 8 54Z" fill="#C23A2E"/><rect x="30" y="52" width="7" height="16" rx="2" fill="#C23A2E"/>
+      <circle cx="24" cy="66" r="2.5" fill="#3B2F2A"/><circle cx="24" cy="76" r="2.5" fill="#3B2F2A"/>
+      <path d="M2 60 L-14 46" stroke="#7A4126" stroke-width="3" stroke-linecap="round"/>
+      <g class="wave"><path d="M46 60 L62 42 M58 46 L64 46 M58 46 L58 40" stroke="#7A4126" stroke-width="3" stroke-linecap="round" fill="none"/></g>
+    </g>
+    <!-- 薑餅人 -->
+    <g transform="translate(284 84)"><g class="hop">
+      <circle cx="18" cy="10" r="10" fill="#B5733E"/>
+      <path d="M8 20 H28 Q40 20 40 26 Q40 31 30 31 H28 L33 46 Q35 52 29 52 H26 L18 40 L10 52 H7 Q1 52 3 46 L8 31 H6 Q-4 31 -4 26 Q-4 20 8 20Z" fill="#B5733E"/>
+      <circle cx="14" cy="8" r="1.6" fill="#3B2F2A"/><circle cx="22" cy="8" r="1.6" fill="#3B2F2A"/><path d="M14 13 Q18 16 22 13" stroke="#FFF8EF" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <circle cx="18" cy="26" r="2" fill="#FF5A4E"/><circle cx="18" cy="34" r="2" fill="#5FD38D"/>
+      <path d="M-1 24 q2 2 0 4 M37 24 q2 2 0 4 M6 46 q3 1 6 0 M24 46 q3 1 6 0" stroke="#FFF8EF" stroke-width="1.6" fill="none"/>
+    </g></g>
+    <!-- 麋鹿 -->
+    <g transform="translate(330 56)">
+      <ellipse cx="30" cy="54" rx="24" ry="13" fill="#9C5733"/>
+      <rect x="12" y="60" width="5" height="24" rx="2" fill="#7A4126"/><rect x="22" y="62" width="5" height="22" rx="2" fill="#6B3820"/><rect x="36" y="62" width="5" height="22" rx="2" fill="#7A4126"/><rect x="45" y="60" width="5" height="24" rx="2" fill="#6B3820"/>
+      <circle cx="7" cy="48" r="4" fill="#FFF8EF"/>
+      <g class="nod">
+        <path d="M44 48 Q50 34 54 26" stroke="#9C5733" stroke-width="11" stroke-linecap="round" fill="none"/>
+        <circle cx="56" cy="22" r="10" fill="#9C5733"/><ellipse cx="64" cy="26" rx="7" ry="5" fill="#B36B40"/>
+        <circle class="blink" cx="69" cy="25" r="3.4" fill="#FF4D40"/><circle cx="57" cy="19" r="1.8" fill="#2A1B14"/>
+        <path d="M50 14 Q44 2 48 -6 M46 4 L40 0 M58 12 Q60 0 66 -6 M61 2 L68 0" stroke="#6B3820" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <path d="M48 30 Q54 36 62 32" stroke="#C23A2E" stroke-width="4" fill="none"/><circle cx="55" cy="35" r="2.4" fill="#FFD36B"/>
+      </g>
+    </g>
+    <path d="M0 140 Q100 122 200 136 T400 132 V170 H0Z" fill="#FFFDF8"/>
+  </svg></div>
 </div>
 
 <div id="overlayRoot"></div>
@@ -627,7 +767,7 @@ function show(name) {
 }
 
 function updateBar() {
-  $("#teamName").textContent = S.team || "";
+  $("#teamName").textContent = S.name ? `${S.name}（${S.cls}-${S.seat}）` : S.team || "";
   $("#fragDots").innerHTML = C.stages.map((s) => `<span class="${isDone(s.id) ? "on" : ""} ${s.id === 5 ? "final" : ""}">${isDone(s.id) ? esc(s.char) : ""}</span>`).join("");
   $("#soundWave").style.opacity = S.mute ? 0 : 1;
   tick();
@@ -662,15 +802,17 @@ $("#btnContinue").onclick = () => { audio.unlock(); show(S.finishedAt ? "cert" :
 
 function renderPrologue() {
   $("#prologueText").innerHTML = PROLOGUE.map((p, i) => `<p class="${i === 0 ? "drop" : ""}">${esc(p)}</p>`).join("");
-  if (S.team) { $("#teamInput").value = S.team; }
+  $("#clsInput").value = S.cls || ""; $("#seatInput").value = S.seat || ""; $("#nameInput").value = S.name || "";
 }
 $("#teamForm").addEventListener("submit", (e) => {
   e.preventDefault();
-  const name = $("#teamInput").value.trim();
-  if (!name) { $("#teamErr").textContent = "請先輸入小隊名稱，證書上會用到喔。"; $("#teamInput").focus(); return; }
+  const cls = $("#clsInput").value.trim(), seat = $("#seatInput").value.trim(), name = $("#nameInput").value.trim();
+  const err = !cls ? ["請輸入班級。", "#clsInput"] : !/^\d{1,2}$/.test(seat) ? ["座號請輸入 1–2 位數字。", "#seatInput"] : !name ? ["請輸入姓名，證書上會用到喔。", "#nameInput"] : null;
+  if (err) { $("#teamErr").textContent = err[0]; $(err[1]).focus(); shake($(err[1])); return; }
   $("#teamErr").textContent = "";
   const isNew = !S.team;
-  S.team = name; if (!S.startedAt) S.startedAt = Date.now();
+  S.cls = cls; S.seat = String(+seat); S.name = name;
+  S.team = `${cls}班 ${S.seat}號 ${name}`; if (!S.startedAt) S.startedAt = Date.now();
   save(); audio.play("start");
   if (pendingStage) { const id = pendingStage; pendingStage = 0; S.unlocked[id] = true; save(); openStage(id); return; }
   show("map");
@@ -678,14 +820,16 @@ $("#teamForm").addEventListener("submit", (e) => {
 });
 
 /* ================= 地圖 ================= */
-const NODES = { 1: [84, 478, "r"], 2: [270, 392, "l"], 3: [92, 300, "r"], 4: [270, 210, "l"], 5: [180, 104, "t"] };
+const NODES = { 1: [84, 478, "r"], 2: [270, 392, "l"], 3: [92, 300, "r"], 4: [270, 210, "l"], 5: [180, 110, "r"] };
 function renderMap() {
   const svg = $("#mapSvg");
-  const path = "M84 478 C 170 478, 270 456, 270 392 S 92 352, 92 300 S 270 266, 270 210 S 180 160, 180 104";
+  const path = "M84 478 C 170 478, 270 456, 270 392 S 92 352, 92 300 S 270 266, 270 210 S 180 166, 180 110";
   const tree = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 -26 L14 0 H-14Z M0 -16 L17 10 H-17Z" fill="#2E5B45" opacity=".85"/><rect x="-3" y="10" width="6" height="7" fill="#8A4A2B"/></g>`;
   let h = `
     <g fill="#FFFDF8">${Array.from({ length: 26 }, (_, i) => `<circle cx="${(i * 97) % 350 + 5}" cy="${(i * 211) % 540 + 10}" r="${1.5 + (i % 3)}" opacity=".9"/>`).join("")}</g>
-    ${tree(30, 380, .9)}${tree(330, 300, 1)}${tree(320, 500, .8)}${tree(30, 200, .8)}${tree(330, 120, .9)}${tree(36, 70, .7)}
+    ${tree(30, 380, .9)}${tree(330, 300, 1)}${tree(30, 200, .8)}${tree(330, 120, .9)}${tree(36, 70, .7)}${tree(300, 40, .7)}
+    <g transform="translate(286 488)"><rect x="0" y="14" width="44" height="30" rx="3" fill="#B5733E"/><path d="M-4 16 L22 -6 L48 16Z" fill="#8A4A2B" stroke="#FFF8EF" stroke-width="3" stroke-linejoin="round"/><rect x="16" y="28" width="12" height="16" rx="6" fill="#C23A2E"/><rect x="5" y="20" width="8" height="8" fill="#FFD36B"/><rect x="31" y="20" width="8" height="8" fill="#FFD36B"/><circle cx="22" cy="5" r="2.5" fill="#FF5A4E"/></g>
+    <g transform="translate(150 500)"><circle cx="0" cy="16" r="12" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="1.5"/><circle cx="0" cy="-2" r="8.5" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="1.5"/><rect x="-6" y="-16" width="12" height="9" fill="#3B2F2A"/><rect x="-9" y="-8" width="18" height="2.5" fill="#3B2F2A"/><path d="M-6 5 Q0 9 6 5" stroke="#C23A2E" stroke-width="3" fill="none"/><path d="M0 -1 L7 1 L0 2Z" fill="#E58A3A"/></g>
     <path d="${path}" fill="none" stroke="#E7DCCB" stroke-width="16" stroke-linecap="round"/>
     <path d="${path}" fill="none" stroke="#C79A3B" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round"/>
     <g transform="translate(40 530)"><rect x="-26" y="-18" width="52" height="24" rx="12" fill="#3B2F2A"/><text x="0" y="-1" text-anchor="middle" font-size="11" font-weight="700" fill="#FFF8EF" font-family="Noto Sans TC, sans-serif">START</text></g>
@@ -710,9 +854,10 @@ function renderMap() {
       <text x="${tx}" y="${ty}" text-anchor="${anchor}" font-size="15" font-weight="700" fill="#3B2F2A" font-family="LXGW WenKai TC, serif">${esc(s.short)}</text>
       <text x="${tx}" y="${ty + 18}" text-anchor="${anchor}" font-size="11.5" fill="#7A6A60" font-family="Noto Sans TC, sans-serif">${esc(s.place)}</text>
     </g>`;
-    if (s.id === current && !S.finishedAt) h += `<use href="#dede" x="${side === "l" ? x - 120 : x + 28}" y="${y + 14}" width="80" height="47" opacity=".95"/>`;
   });
+  h += SANTA_SVG;
   svg.innerHTML = h;
+  moveSanta(S.finishedAt ? 5 : current);
   svg.querySelectorAll(".node").forEach((n) => {
     const go = () => openStage(+n.dataset.id);
     n.addEventListener("click", go);
@@ -721,8 +866,62 @@ function renderMap() {
   $("#doneCount").textContent = doneCount();
   const tip = $("#mapTip");
   if (S.finishedAt) tip.textContent = "五片故事都找回來了！點右上角的書本可以重讀完整故事。";
-  else if (current === 5) tip.textContent = "四個通關字到齊！點閃紅光的第五關，DeDe 在等你。";
+  else if (current === 5) tip.textContent = "四個通關字到齊！聖誕老人在第五關等你，DeDe 也在那裡！";
   else tip.textContent = `點地圖上閃紅光的第${NUM[current]}關開始挑戰（建議地點：${stage(current).place}）。`;
+}
+
+/* 聖誕老人：站在目前關卡上方，過關後沿著小路走到下一關 */
+const SANTA_SVG = `<path id="trail" d="M84 478 C 170 478, 270 456, 270 392 S 92 352, 92 300 S 270 266, 270 210 S 180 166, 180 110" fill="none" stroke="none"/>
+<g id="santa" class="santa" pointer-events="none"><g id="santaFlip"><g class="bodybob">
+  <ellipse cx="25" cy="58" rx="14" ry="3" fill="#3B2F2A" opacity=".18"/>
+  <g class="legs"><rect class="l" x="16" y="44" width="7" height="13" rx="3" fill="#2A1B14"/><rect class="r" x="27" y="44" width="7" height="13" rx="3" fill="#2A1B14"/></g>
+  <path d="M7 34 Q4 37 8 40" stroke="#C23A2E" stroke-width="6" stroke-linecap="round" fill="none"/>
+  <path d="M9 48 Q7 29 25 27 Q43 29 41 48Z" fill="#C23A2E"/>
+  <rect x="9" y="38" width="32" height="5" fill="#2A1B14"/><rect x="21" y="37.5" width="8" height="6" rx="1" fill="none" stroke="#C79A3B" stroke-width="1.8"/>
+  <rect x="8" y="45" width="34" height="5" rx="2.5" fill="#FFF8EF"/><rect x="23" y="28" width="4" height="10" fill="#FFF8EF"/>
+  <g class="arm"><path d="M40 34 Q47 28 47 20" stroke="#C23A2E" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="47" cy="19" r="3.6" fill="#2E5B45"/></g>
+  <circle cx="25" cy="19" r="9" fill="#F6CDAE"/>
+  <path d="M14 19 Q13 33 25 35 Q37 33 36 19 Q31 25 25 24 Q19 25 14 19Z" fill="#FFFFFF"/>
+  <path d="M19 23 Q25 20 31 23 Q25 26 19 23Z" fill="#F2F2F2"/>
+  <circle cx="21.5" cy="17" r="1.5" fill="#2A1B14"/><circle cx="28.5" cy="17" r="1.5" fill="#2A1B14"/><circle cx="25" cy="21" r="2" fill="#E88D7D"/>
+  <circle cx="18" cy="20" r="2" fill="#F2A08F" opacity=".7"/><circle cx="32" cy="20" r="2" fill="#F2A08F" opacity=".7"/>
+  <path d="M15 13 Q19 -2 33 2 Q41 6 43 16" fill="#C23A2E"/><rect x="14" y="10" width="22" height="6" rx="3" fill="#FFFFFF"/><circle cx="43" cy="16" r="4" fill="#FFFFFF"/>
+</g></g>
+<g class="ho"><rect x="-6" y="-24" width="62" height="20" rx="10" fill="#FFFDF8" stroke="#C23A2E" stroke-width="1.5"/><text x="25" y="-10" text-anchor="middle" font-size="11" font-weight="700" fill="#C23A2E" font-family="Noto Sans TC, sans-serif">Ho Ho Ho!</text></g>
+</g>`;
+let trailLens = null, santaAnim = 0;
+function moveSanta(target) {
+  const svg = $("#mapSvg"), trail = $("#trail", svg), santa = $("#santa", svg), flip = $("#santaFlip", svg);
+  if (!trail || !santa) return;
+  if (!trailLens) {
+    const total = trail.getTotalLength(); trailLens = { total };
+    C.stages.forEach((s) => {
+      const [nx, ny] = NODES[s.id]; let best = 0, bd = 1e9;
+      for (let l = 0; l <= total; l += 2) { const p = trail.getPointAtLength(l), d = (p.x - nx) ** 2 + (p.y - ny) ** 2; if (d < bd) { bd = d; best = l; } }
+      trailLens[s.id] = best;
+    });
+  }
+  const place = (len, dir) => {
+    const p = trail.getPointAtLength(len), k = 0.95;
+    santa.setAttribute("transform", `translate(${p.x - 25 * k} ${p.y - 30 - 58 * k}) scale(${k})`);
+    if (dir) flip.setAttribute("transform", dir < 0 ? "translate(50 0) scale(-1 1)" : "");
+  };
+  const say = () => { santa.classList.add("say"); setTimeout(() => santa.classList.remove("say"), 2200); };
+  const from = Math.min(S.santaAt || 1, target);
+  cancelAnimationFrame(santaAnim);
+  if (from === target || reduce) { place(trailLens[target], 1); S.santaAt = target; save(); if (from !== target) say(); return; }
+  S.santaAt = target; save();
+  const a = trailLens[from], b = trailLens[target], dur = 1700 * (target - from);
+  let t0 = 0, lastX = null;
+  santa.classList.add("walking"); place(a, 1);
+  const stepFn = (t) => {
+    if (!t0) t0 = t;
+    const u = Math.min(1, (t - t0) / dur), e = u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2, len = a + (b - a) * e;
+    const x = trail.getPointAtLength(len).x; const dir = lastX == null ? 1 : Math.sign(x - lastX) || 0; lastX = x;
+    place(len, dir);
+    if (u < 1) santaAnim = requestAnimationFrame(stepFn); else { santa.classList.remove("walking"); say(); audio.play("ok"); }
+  };
+  setTimeout(() => { santaAnim = requestAnimationFrame(stepFn); }, 450);
 }
 
 /* ================= 進入關卡 ================= */
@@ -1109,7 +1308,8 @@ function renderCert() {
     </svg>
     <p class="lbl">ADVENTURE CERTIFICATE</p>
     <h2>聖誕閱讀探險家</h2>
-    <div class="who">${esc(S.team)}</div>
+    <p style="font-size:15px;color:var(--ink-soft);margin-bottom:-8px">${esc(S.cls ? `${S.cls} 班　${S.seat} 號` : "")}</p>
+    <div class="who">${esc(S.name || S.team)}</div>
     <p style="font-family:var(--font-story);font-size:17px;max-width:22em">完成了 DeDe 的五項閱讀挑戰，找回失竊的聖誕故事，正式成為四維聖誕閱讀探險家！</p>
     <div class="chars-row">${C.stages.map((s) => `<span${s.id === 5 ? ' style="background:var(--gold)"' : ""}>${esc(s.char)}</span>`).join("")}</div>
     <div class="cert-grid">
@@ -1160,7 +1360,8 @@ async function downloadCert(total) {
   x.textAlign = "center";
   x.fillStyle = "#C79A3B"; x.font = "700 28px " + ui; x.fillText("A D V E N T U R E   C E R T I F I C A T E", 600, 560);
   x.fillStyle = "#3B2F2A"; x.font = "700 76px " + story; x.fillText("聖誕閱讀探險家", 600, 660);
-  x.fillStyle = "#C23A2E"; x.font = "700 84px " + story; x.fillText(S.team, 600, 800, 900);
+  x.fillStyle = "#7A6A60"; x.font = "34px " + ui; if (S.cls) x.fillText(`${S.cls} 班　${S.seat} 號`, 600, 720);
+  x.fillStyle = "#C23A2E"; x.font = "700 84px " + story; x.fillText(S.name || S.team, 600, 800, 900);
   x.strokeStyle = "#E7DCCB"; x.lineWidth = 3; x.beginPath(); x.moveTo(300, 830); x.lineTo(900, 830); x.stroke();
   x.fillStyle = "#3B2F2A"; x.font = "36px " + story;
   x.fillText("完成了 DeDe 的五項閱讀挑戰，找回失竊的聖誕故事，", 600, 910);
@@ -1172,7 +1373,7 @@ async function downloadCert(total) {
   x.fillStyle = "#FBF6EC"; x.font = "700 52px ui-monospace, Menlo, monospace"; x.fillText(S.code.split("").join(" "), 600, 1362);
   x.fillStyle = "#7A6A60"; x.font = "26px " + ui; x.fillText("完賽驗證碼", 600, 1430);
   x.fillStyle = "#2E5B45"; x.font = "700 32px " + story; x.fillText(C.eventName, 600, 1500);
-  const a = document.createElement("a"); a.download = "DeDe_Christmas_Certificate.png"; a.href = c.toDataURL("image/png");
+  const a = document.createElement("a"); a.download = "Christmas_Certificate_" + (S.cls || "") + "_" + (S.seat || "") + ".png"; a.href = c.toDataURL("image/png");
   document.body.appendChild(a); a.click(); a.remove();
   toast("證書圖片已下載");
 }
@@ -1213,7 +1414,7 @@ const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   size(); addEventListener("resize", size);
   flakes = Array.from({ length: reduce ? 24 : 55 }, () => ({ x: Math.random() * W, y: Math.random() * H, r: 1 + Math.random() * 2.6, s: 0.3 + Math.random() * 0.8, p: Math.random() * 6 }));
   const draw = () => {
-    x.clearRect(0, 0, W, H); x.fillStyle = "rgba(169,194,212,.55)";
+    x.clearRect(0, 0, W, H); x.fillStyle = "rgba(255,255,255,.75)";
     for (const f of flakes) {
       if (!reduce) { f.y += f.s; f.p += 0.01; f.x += Math.sin(f.p) * 0.4; if (f.y > H + 5) { f.y = -5; f.x = Math.random() * W; } }
       x.beginPath(); x.arc(f.x, f.y, f.r, 0, 7); x.fill();
