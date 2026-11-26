@@ -911,6 +911,11 @@ window.QUEST_CONFIG = {
 
   // 工作人員核銷用 PIN（請在活動前更改）
   staffPin: "1225",
+
+  // Google 試算表紀錄：貼上 Apps Script「網頁應用程式」網址（https://script.google.com/macros/s/.../exec）。留空就不傳送。
+  sheetUrl: "",
+  // 要和 Apps Script 裡的 TOKEN 相同
+  sheetToken: "swsh-xmas-2026",
   // 完賽驗證碼用的鹽值（請在活動前改成只有工作人員知道的字串）
   salt: "dede-xmas-2026",
 
@@ -1064,6 +1069,31 @@ document.querySelectorAll(".scene .poke").forEach((g) => g.addEventListener("cli
   g.classList.remove("boing"); void g.getBBox(); g.classList.add("boing"); audio.play(g.dataset.snd || "tap");
 }));
 
+/* ================= Google 試算表紀錄 =================
+   送不出去（例如網路斷線）的紀錄會先存在手機，下次有動作或恢復連線時再補送。 */
+function fmtZh(ms) { const t = Math.max(0, Math.floor(ms / 1000)); return `${Math.floor(t / 60)} 分 ${String(t % 60).padStart(2, "0")} 秒`; }
+function report(type, extra) {
+  if (!C.sheetUrl || S.demo) return;
+  S.outbox = S.outbox || [];
+  S.outbox.push(Object.assign({ type, sid: S.sid, cls: S.cls, seat: S.seat, name: S.name, startedAt: S.startedAt, ts: Date.now(), token: C.sheetToken }, extra || {}));
+  save(); flushOutbox();
+}
+let flushing = false;
+async function flushOutbox() {
+  if (flushing || !C.sheetUrl || !S.outbox || !S.outbox.length) return;
+  flushing = true;
+  try {
+    while (S.outbox.length) {
+      const ev = S.outbox[0];
+      await fetch(C.sheetUrl, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(ev), keepalive: true });
+      S.outbox.shift(); save();
+    }
+  } catch (e) { /* 沒網路：留著下次再送 */ }
+  flushing = false;
+}
+addEventListener("online", flushOutbox);
+setTimeout(flushOutbox, 1500);
+
 /* ================= 首頁 ================= */
 function renderHome() {
   $("#eventName").textContent = C.eventName;
@@ -1092,6 +1122,8 @@ $("#teamForm").addEventListener("submit", (e) => {
   const isNew = !S.team;
   S.cls = cls; S.seat = String(+seat); S.name = name;
   S.team = `${cls}班 ${S.seat}號 ${name}`; if (!S.startedAt) S.startedAt = Date.now();
+  if (!S.sid) S.sid = Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  report("start");
   save(); audio.play("start");
   if (pendingStage) { const id = pendingStage; pendingStage = 0; S.unlocked[id] = true; save(); openStage(id); return; }
   show("map");
@@ -1490,8 +1522,13 @@ const STAGES = {
 /* ================= 完成關卡 & 獎勵卡 ================= */
 function finishStage(id, stars) {
   if (!S.done[id]) S.done[id] = { stars, at: Date.now() };
+  const first = !S.done[id].sent; S.done[id].sent = true;
   if (id === 5 && !S.finishedAt) { S.finishedAt = Date.now(); S.code = makeCode(S.team, S.finishedAt); }
   save(); updateBar();
+  if (first) {
+    report("stage", { stage: id, stars: S.done[id].stars, elapsed: fmtZh(Date.now() - S.startedAt) });
+    if (id === 5) report("finish", { stage: 5, elapsed: fmtZh(S.finishedAt - S.startedAt), code: S.code, total: C.stages.reduce((a, s) => a + (S.done[s.id] ? S.done[s.id].stars : 0), 0) });
+  }
   if (id !== 5) { audio.play("win"); confetti(0.45); }
   openReward(id, stars, false);
 }
@@ -1568,7 +1605,7 @@ function askReset() {
       <div class="btn-row"><button class="btn ghost" data-close>先不要</button><button class="btn" id="resetYes">確定重新開始</button></div>
     </div>`);
   $("#resetYes", ov).onclick = () => {
-    const snd = S.snd; S = fresh(); S.snd = snd; save(); pendingStage = 0;
+    const snd = S.snd, ob = S.outbox || []; S = fresh(); S.snd = snd; S.outbox = ob; save(); pendingStage = 0;
     closeOverlay(true); show("home"); toast("已重新開始，請重新登入");
   };
 }
@@ -1627,7 +1664,7 @@ function renderCert() {
       <form class="row" id="redeemForm" novalidate><input class="input" id="staffPin" type="password" inputmode="numeric" maxlength="8" placeholder="館長 PIN" autocomplete="off"><button class="btn small" type="submit">蓋章</button></form><p class="err" id="pinErr"></p>`;
     $("#redeemForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      if ($("#staffPin").value.trim() === C.staffPin) { S.redeemedAt = Date.now(); save(); audio.play("ok"); renderCert(); }
+      if ($("#staffPin").value.trim() === C.staffPin) { S.redeemedAt = Date.now(); save(); report("redeem", { code: S.code }); audio.play("ok"); renderCert(); }
       else { $("#pinErr").textContent = "PIN 不正確。"; shake($("#staffPin")); }
     });
   }

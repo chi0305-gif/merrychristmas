@@ -13,6 +13,11 @@ window.QUEST_CONFIG = {
 
   // 工作人員核銷用 PIN（請在活動前更改）
   staffPin: "1225",
+
+  // Google 試算表紀錄：貼上 Apps Script「網頁應用程式」網址（https://script.google.com/macros/s/.../exec）。留空就不傳送。
+  sheetUrl: "",
+  // 要和 Apps Script 裡的 TOKEN 相同
+  sheetToken: "swsh-xmas-2026",
   // 完賽驗證碼用的鹽值（請在活動前改成只有工作人員知道的字串）
   salt: "dede-xmas-2026",
 
