@@ -1200,7 +1200,7 @@ function openStage(id) {
   if (isDone(id)) { openReward(id, S.done[id].stars, true); return; }
   if (!isUnlocked(id)) { toast(`請先完成第${NUM[id - 1]}關「${stage(id - 1).short}」`); return; }
   if (!S.team) { pendingStage = id; show("home"); return; }
-  S.unlocked[id] = true; save();
+  S.unlocked[id] = true; S.stageStart = S.stageStart || {}; if (!S.stageStart[id]) S.stageStart[id] = Date.now(); save();
   $("#stageHead").innerHTML = `
     <div class="chips"><span class="chip red">第${NUM[id]}關</span><span class="chip">${esc(s.type)}</span></div>
     <h2>${esc(s.title)}</h2>
@@ -1483,8 +1483,8 @@ function finishStage(id, stars) {
   if (id === 5 && !S.finishedAt) { S.finishedAt = Date.now(); S.code = makeCode(S.team, S.finishedAt); }
   save(); updateBar();
   if (first) {
-    report("stage", { stage: id, stars: S.done[id].stars, elapsed: fmtZh(Date.now() - S.startedAt) });
-    if (id === 5) report("finish", { stage: 5, elapsed: fmtZh(S.finishedAt - S.startedAt), code: S.code, total: C.stages.reduce((a, s) => a + (S.done[s.id] ? S.done[s.id].stars : 0), 0) });
+    report("stage", { stage: id, stars: S.done[id].stars, dur: fmtZh(S.done[id].at - ((S.stageStart || {})[id] || S.done[id].at)), elapsed: fmtZh(Date.now() - S.startedAt) });
+    if (id === 5) report("finish", { stage: 5, elapsed: fmtZh(S.finishedAt - S.startedAt), total: C.stages.reduce((a, s) => a + (S.done[s.id] ? S.done[s.id].stars : 0), 0) });
   }
   if (id !== 5) { audio.play("win"); confetti(0.45); }
   openReward(id, stars, false);
@@ -1620,7 +1620,7 @@ function renderCert() {
       <form class="row" id="redeemForm" novalidate><input class="input" id="staffPin" type="password" inputmode="numeric" maxlength="8" placeholder="館長 PIN" autocomplete="off"><button class="btn small" type="submit">蓋章</button></form><p class="err" id="pinErr"></p>`;
     $("#redeemForm").addEventListener("submit", (e) => {
       e.preventDefault();
-      if ($("#staffPin").value.trim() === C.staffPin) { S.redeemedAt = Date.now(); save(); report("redeem", { code: S.code }); audio.play("ok"); renderCert(); }
+      if ($("#staffPin").value.trim() === C.staffPin) { S.redeemedAt = Date.now(); save(); report("redeem"); audio.play("ok"); renderCert(); }
       else { $("#pinErr").textContent = "PIN 不正確。"; shake($("#staffPin")); }
     });
   }
