@@ -548,7 +548,7 @@ details.cb[open] summary { margin-bottom: 8px; }
         <div><b>5</b><span>本推薦書</span></div>
       </div>
       <div class="btn-row"><button class="btn" id="btnStart">開始冒險</button></div>
-      <div class="btn-row" id="continueRow" hidden><button class="btn green" id="btnContinue">繼續冒險</button></div>
+      <div class="btn-row" id="continueRow" hidden><button class="btn green" id="btnContinue">繼續冒險</button><button class="btn ghost" data-reset>重新開始</button></div>
       <p class="en" id="enName"></p>
     </div>
   </section>
@@ -614,11 +614,7 @@ details.cb[open] summary { margin-bottom: 8px; }
     <div class="pages" id="pages"></div>
     <div class="btn-row" id="bookActions"></div>
     <div style="text-align:center">
-      <button class="danger" id="btnReset">清除進度（交給下一組使用）</button>
-      <div id="resetConfirm" hidden style="display:grid;gap:8px;justify-items:center;margin-top:6px">
-        <p class="note">確定要清除這支手機上的所有進度嗎？完賽畫面也會一起消失。</p>
-        <div class="btn-row"><button class="btn small ghost" id="btnResetNo">取消</button><button class="btn small" id="btnResetYes">確定清除</button></div>
-      </div>
+      <button class="btn small ghost" data-reset>重新開始遊戲（換下一位玩）</button>
     </div>
   </section>
 
@@ -633,6 +629,7 @@ details.cb[open] summary { margin-bottom: 8px; }
   <section class="screen" data-screen="cert" hidden>
     <div class="page cert" id="cert"></div>
     <div class="staff" id="staffBox"></div>
+    <div class="btn-row"><button class="btn green" data-reset>重新開始遊戲（換下一位玩）</button></div>
   </section>
   <div class="scene" aria-hidden="true"><svg viewBox="0 0 400 170">
     <path d="M0 120 Q70 92 140 112 T270 104 T400 112 V170 H0Z" fill="#DCE8EE"/>
@@ -796,6 +793,7 @@ function renderHome() {
   else b.hidden = true;
   $("#continueRow").hidden = !S.team;
   $("#btnStart").textContent = S.team ? "看序章" : "開始冒險";
+  $("#btnStart").hidden = !!S.team;
 }
 $("#btnStart").onclick = () => { audio.unlock(); renderPrologue(); show("prologue"); };
 $("#btnContinue").onclick = () => { audio.unlock(); show(S.finishedAt ? "cert" : "map"); };
@@ -1273,11 +1271,21 @@ function renderBook() {
   $("#bookActions").innerHTML = five ? `<button class="btn" id="bRead">重讀完整故事</button><button class="btn green" id="bCert">完賽證書</button>` : `<button class="btn green" id="bMap">回冒險地圖</button>`;
   const b1 = $("#bRead"), b2 = $("#bCert"), b3 = $("#bMap");
   if (b1) b1.onclick = () => show("story"); if (b2) b2.onclick = () => show("cert"); if (b3) b3.onclick = () => show("map");
-  $("#resetConfirm").hidden = true;
 }
-$("#btnReset").onclick = () => { $("#resetConfirm").hidden = false; };
-$("#btnResetNo").onclick = () => { $("#resetConfirm").hidden = true; };
-$("#btnResetYes").onclick = () => { const mute = S.mute; S = fresh(); S.mute = mute; save(); pendingStage = 0; show("home"); toast("進度已清除，可以交給下一組了"); };
+/* 重新開始：任何畫面上的 [data-reset] 按鈕都會先跳出確認視窗 */
+function askReset() {
+  const ov = overlay(`<div class="modal">
+      <svg viewBox="0 0 80 80" width="72" style="margin:0 auto" aria-hidden="true"><use href="#dedehead"/></svg>
+      <h3>要重新開始遊戲嗎？</h3>
+      <p>這支手機上的登入資料、闖關進度和完賽證書都會清除，回到第一關重新玩。</p>
+      <div class="btn-row"><button class="btn ghost" data-close>先不要</button><button class="btn" id="resetYes">確定重新開始</button></div>
+    </div>`);
+  $("#resetYes", ov).onclick = () => {
+    const mute = S.mute; S = fresh(); S.mute = mute; save(); pendingStage = 0;
+    closeOverlay(true); show("home"); toast("已重新開始，請重新登入");
+  };
+}
+document.addEventListener("click", (e) => { if (e.target.closest("[data-reset]")) askReset(); });
 
 /* ================= 完整故事 ================= */
 function renderStory() {
