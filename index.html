@@ -7,7 +7,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Mountains+of+Christmas:wght@700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&family=Mountains+of+Christmas:wght@700&family=Chiron+GoRound+TC:wght@700;900&family=Lilita+One&family=Noto+Sans+TC:wght@400;500;700&display=swap">
 <style>
 /* Layout: 一本會動的聖誕故事書。米白紙張為底，紅／綠只用在「可以按」和「已完成」，金色只給獎勵。
    Deliberately single-theme: the storybook look stays cream in both light and dark hosts. */
@@ -29,6 +29,8 @@
   --dede-dark: #5E301B;
   --night: #173D32;      /* 聖誕夜森林綠：頁面底色 */
   --night-2: #0E2620;
+  --font-cute: "Chiron GoRound TC", "Noto Sans TC", "PingFang TC", sans-serif;
+  --font-pop: "Lilita One", "Chiron GoRound TC", sans-serif;
   --font-story: "LXGW WenKai TC", "Kaiti TC", "BiauKai", "STKaiti", serif;
   --font-ui: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
   --r: 18px;
@@ -498,6 +500,46 @@ details.cb[open] summary { margin-bottom: 8px; }
 .chapter p { font-family: var(--font-story); font-size: 18px; line-height: 1.95; }
 .moral { text-align: center; font-family: var(--font-story); font-size: 22px; color: var(--red); padding: 16px 0 4px; }
 
+/* ---------- 參考版面：可愛聖誕元素 ---------- */
+.cover h1 { font-family: var(--font-cute); font-weight: 900; color: var(--red); letter-spacing: .04em; line-height: 1.15;
+  text-shadow: 3px 3px 0 #FFFFFF, -2px -2px 0 #FFFFFF, 2px -2px 0 #FFFFFF, -2px 2px 0 #FFFFFF, 5px 6px 0 rgba(46,91,69,.25); }
+.cover h1 .ding { display: block; font-size: .62em; color: var(--green); transform: rotate(-3deg); margin-bottom: 2px; }
+.cover h1 .sub { font-family: var(--font-cute); font-weight: 700; color: #B8862F; font-size: .5em; letter-spacing: .1em; margin-top: 8px; text-shadow: none; }
+.motto { font-family: var(--font-cute); font-weight: 900; font-size: 24px; color: var(--green); letter-spacing: .06em; background: #FCE3E4; border-radius: 999px; padding: 4px 18px; }
+.motto .g { color: var(--red); } .motto .y { color: #D99A1E; }
+.facts div { border-radius: 16px; box-shadow: none; }
+.facts .f1 { background: var(--red); } .facts .f2 { background: #0F5A40; } .facts .f3 { background: #F4B9C8; }
+.facts .f1 b, .facts .f1 span, .facts .f2 b, .facts .f2 span { color: #FFF8EF; }
+.facts .f3 b { color: var(--red); } .facts .f3 span { color: #8E2A22; }
+.facts b { font-family: var(--font-pop); font-weight: 400; font-size: 28px; }
+.mosaic { display: grid; grid-template-columns: repeat(4, 1fr); width: 100%; border-radius: 16px; overflow: hidden; box-shadow: 0 6px 14px -8px rgba(0,0,0,.4); }
+.mosaic svg { display: block; width: 100%; height: auto; }
+.mosaic.thin { grid-template-columns: repeat(8, 1fr); border-radius: 12px; margin-top: -6px; }
+.mosaic svg:nth-child(odd) { animation: tilepop 4s ease-in-out infinite; }
+@keyframes tilepop { 0%, 85%, 100% { filter: none; } 92% { filter: brightness(1.15); } }
+.tagline { font-family: var(--font-pop); font-size: 18px; letter-spacing: .14em; color: var(--green); }
+.tagline i { font-style: normal; color: var(--gold); }
+.page.airmail { border: 10px solid transparent; border-radius: 6px; padding: 26px 18px 22px;
+  background: linear-gradient(#FFFDF8, #FFFDF8) padding-box, repeating-linear-gradient(-45deg, #E1141B 0 14px, #FFFFFF 14px 24px, #557A2C 24px 38px, #FFFFFF 38px 48px) border-box; }
+.mail-head { font-family: var(--font-pop); color: #557A2C; letter-spacing: .3em; font-size: 15px; text-align: center; margin-bottom: 2px; }
+.mail-head span { display: block; font-family: "Mountains of Christmas", cursive; font-weight: 700; color: #E1141B; font-size: 40px; letter-spacing: 0; line-height: 1; }
+.postmark { position: absolute; top: 10px; left: 6px; width: 92px; transform: rotate(-10deg); pointer-events: none; }
+.pstamp { position: absolute; top: 8px; right: 10px; width: 46px; transform: rotate(6deg); pointer-events: none; }
+.modal.reward { background: #FDE3E4; border-radius: 48% 52% 46% 54% / 7% 6% 7% 6%; padding: 26px 24px 24px; overflow: visible; }
+.modal.reward .frag { background: #FFFFFF; }
+.modal.reward .bookrec { background: #FFFFFF; box-shadow: none; }
+.stk { position: absolute; pointer-events: none; filter: drop-shadow(0 3px 2px rgba(0,0,0,.15)); animation: swing 2.6s ease-in-out infinite alternate; }
+.s-gift { width: 52px; top: 10px; left: -16px; transform-origin: 50% 100%; }
+.s-holly { width: 76px; top: -6px; right: -18px; animation-delay: -.8s; }
+.s-hat { width: 62px; top: 38%; left: -26px; animation-delay: -1.4s; }
+.s-cane { width: 30px; top: 34%; right: -14px; animation-delay: -.4s; }
+.s-socks { width: 60px; bottom: 30px; left: -22px; animation-delay: -1.9s; }
+.s-orn { width: 44px; bottom: 76px; right: -16px; animation-delay: -1.1s; }
+.s-flake { width: 26px; top: 26%; right: 22px; animation: spin 9s linear infinite; }
+.nightbanner { margin: -6px -4px 0; }
+.nightbanner svg { display: block; width: 100%; height: auto; }
+.nightbanner .blink { animation: twinkle 1.5s ease-in-out infinite alternate; }
+.nightbanner .blink:nth-child(3n) { animation-delay: -.7s; }
 /* ---------- 證書（粉紅聖誕花紋 + 探頭聖誕老人） ---------- */
 .cert2 { position: relative; border-radius: 14px; padding: 18px; background-color: #F6C4CB; background-size: 110px 110px; box-shadow: 0 14px 30px -14px rgba(0,0,0,.45); overflow: hidden; }
 .cert-in { position: relative; background: #FFF6F4; border: 3px solid #D9483E; outline: 1px solid #D9483E; outline-offset: -9px; padding: 24px 16px 18px; display: grid; justify-items: center; text-align: center; gap: 6px; min-height: 560px; }
@@ -521,7 +563,7 @@ details.cb[open] summary { margin-bottom: 8px; }
 .sline i { display: block; border-top: 1.5px solid #8E2A22; }
 .sline small { font-size: 11px; letter-spacing: .25em; color: #8E2A22; padding-left: 4px; }
 .cert-santa { position: absolute; left: -4px; bottom: -6px; width: 112px; pointer-events: none; }
-.seal-stamp { position: absolute; right: 2px; top: -46px; width: 96px; transform: rotate(-14deg); mix-blend-mode: multiply; opacity: .9; animation: stampin .55s cubic-bezier(.3,1.6,.5,1) both; }
+.seal-stamp { position: absolute; right: -2px; top: -58px; width: 100px; transform: rotate(-10deg); filter: drop-shadow(0 3px 3px rgba(120,80,10,.3)); animation: stampin .55s cubic-bezier(.3,1.6,.5,1) both; }
 @keyframes stampin { from { transform: rotate(-30deg) scale(2.4); opacity: 0; } }
 .redeem-tip { text-align: center; font-size: 15px; }
 /* ---------- certificate ---------- */
@@ -711,14 +753,17 @@ details.cb[open] summary { margin-bottom: 8px; }
         </g>
       </svg>
       <p class="globe-tip">點一下水晶球，搖出一場雪！</p>
-      <h1>叮叮噹！聖誕閱讀闖關<span class="sub">2026 的最後任務</span></h1>
+      <h1><span class="ding">叮叮噹！</span>聖誕閱讀闖關<span class="sub">2026 的最後任務</span></h1>
+      <p class="motto"><b class="g">四</b>曾相識　<b class="y">維</b>讀有你</p>
       <p class="slogan" id="slogan"></p>
       <div class="banner" id="pendingBanner" hidden></div>
       <div class="facts">
-        <div><b>5</b><span>個關卡</span></div>
-        <div><b>10</b><span>分鐘完成</span></div>
-        <div><b>5</b><span>本推薦書</span></div>
+        <div class="f1"><b>5</b><span>個關卡</span></div>
+        <div class="f2"><b>10</b><span>分鐘完成</span></div>
+        <div class="f3"><b>5</b><span>本推薦書</span></div>
       </div>
+      <div class="mosaic" data-mosaic="peppermint,candy,bauble,sparkle,tree,flake,starcookie,cane"></div>
+      <p class="tagline">BOOK <i>★</i> STORY <i>★</i> GIFT</p>
       <div class="btn-row"><button class="btn" id="btnStart">開始冒險</button></div>
       <div class="btn-row" id="continueRow" hidden><button class="btn green" id="btnContinue">繼續冒險</button><button class="btn ghost" data-reset>重新開始</button></div>
       <p class="en" id="enName"></p>
@@ -727,7 +772,10 @@ details.cb[open] summary { margin-bottom: 8px; }
 
   <!-- 序章 + 建立隊伍 -->
   <section class="screen" data-screen="prologue" hidden>
-    <div class="page deckle">
+    <div class="page airmail">
+      <div class="postmark" aria-hidden="true"><svg viewBox="0 0 120 70"><g fill="none" stroke="#C23A2E" stroke-width="2" opacity=".7"><circle cx="34" cy="35" r="27"/><circle cx="34" cy="35" r="21"/><path d="M66 22 q8 -6 16 0 t16 0 t16 0 M66 35 q8 -6 16 0 t16 0 t16 0 M66 48 q8 -6 16 0 t16 0 t16 0"/></g><text x="34" y="32" text-anchor="middle" font-size="8" font-weight="700" fill="#C23A2E" opacity=".75" font-family="Noto Sans TC, sans-serif">NORTH POLE</text><text x="34" y="44" text-anchor="middle" font-size="8" font-weight="700" fill="#C23A2E" opacity=".75" font-family="Noto Sans TC, sans-serif">12.25</text></svg></div>
+      <div class="pstamp" aria-hidden="true"><svg viewBox="0 0 60 72"><rect x="2" y="2" width="56" height="68" fill="#FFFFFF" stroke="#E7DCCB" stroke-width="2" stroke-dasharray="4 3"/><rect x="8" y="8" width="44" height="56" fill="#DCE8DF"/><path d="M30 14 L44 40 H36 L46 56 H14 L24 40 H16Z" fill="#2E5B45"/><path d="M30 8 l2 4 4.5 .5 -3.4 3 1 4.4 -4.1 -2.4 -4.1 2.4 1 -4.4 -3.4 -3 4.5 -.5z" fill="#F0B23A"/><text x="30" y="62" text-anchor="middle" font-size="6" font-weight="700" fill="#C23A2E" font-family="Noto Sans TC, sans-serif">SWSH 2026</text></svg></div>
+      <p class="mail-head">MERRY <span>Christmas</span></p>
       <div class="story" id="prologueText"></div>
     </div>
     <div class="rulebox">
@@ -776,6 +824,7 @@ details.cb[open] summary { margin-bottom: 8px; }
 
   <!-- 02 冒險地圖 -->
   <section class="screen" data-screen="map" hidden>
+    <div class="mosaic thin" data-mosaic="sparkle,tree,peppermint,starcookie,candy,flake,bauble,cane"></div>
     <div class="map-head">
       <div><div class="eyebrow">ADVENTURE MAP</div><h2>冒險任務地圖</h2></div>
       <div class="progress"><b id="doneCount">0</b> / 5 片故事</div>
@@ -807,6 +856,16 @@ details.cb[open] summary { margin-bottom: 8px; }
 
   <!-- 05 完整故事 -->
   <section class="screen" data-screen="story" hidden>
+    <div class="nightbanner" aria-hidden="true"><svg viewBox="0 0 400 230">
+      <rect width="400" height="230" rx="18" fill="#232A4A"/>
+      <g fill="#FFFFFF"><circle class="blink" cx="24" cy="20" r="2" opacity="0.8"/><circle class="blink" cx="70" cy="60" r="3.5" opacity="1"/><circle class="blink" cx="120" cy="18" r="2" opacity="0.7"/><circle class="blink" cx="180" cy="40" r="1.6" opacity="0.6"/><circle class="blink" cx="240" cy="14" r="3" opacity="0.9"/><circle class="blink" cx="300" cy="52" r="2" opacity="0.8"/><circle class="blink" cx="370" cy="20" r="4" opacity="1"/><circle class="blink" cx="352" cy="96" r="2.4" opacity="0.8"/><circle class="blink" cx="30" cy="120" r="2" opacity="0.6"/><circle class="blink" cx="210" cy="96" r="1.8" opacity="0.7"/><circle class="blink" cx="90" cy="150" r="2.6" opacity="0.9"/><circle class="blink" cx="330" cy="150" r="1.6" opacity="0.6"/><circle class="blink" cx="150" cy="120" r="1.4" opacity="0.5"/></g>
+      <text x="168" y="74" text-anchor="middle" font-family="Lilita One, sans-serif" font-size="40" fill="#F0332A" transform="rotate(-4 168 74)">MERRY</text>
+      <text x="196" y="132" text-anchor="middle" font-family="Mountains of Christmas, Lilita One, cursive" font-weight="700" font-size="60" fill="#F0332A" transform="rotate(-4 196 132)">Christmas!</text>
+      <g transform="translate(300 26)"><path d="M6 22 Q20 -2 44 6 Q56 12 56 26" stroke="#7A5A4A" stroke-width="3" fill="none"/><circle cx="30" cy="30" r="20" fill="#FFF8EF"/><circle cx="8" cy="26" r="8" fill="#D9483E"/><circle cx="54" cy="26" r="8" fill="#D9483E"/><circle cx="24" cy="28" r="2" fill="#3B2F2A"/><circle cx="36" cy="28" r="2" fill="#3B2F2A"/><path d="M30 32 L42 34 L30 36Z" fill="#F08A3A"/><path d="M26 40 Q30 43 34 40" stroke="#3B2F2A" stroke-width="1.6" fill="none" stroke-linecap="round"/></g>
+      <g transform="translate(18 150)"><path d="M48 0 L66 26 H58 L74 50 H62 L82 80 H14 L34 50 H22 L38 26 H30Z" fill="#0F6B3E"/><path d="M26 44 Q48 54 70 44 M20 68 Q48 80 78 68" stroke="#F05A5A" stroke-width="3" fill="none"/><circle cx="40" cy="36" r="3" fill="#F0B23A"/><circle cx="58" cy="60" r="3.4" fill="#8CC5B8"/><circle cx="34" cy="62" r="3" fill="#F0B23A"/><path d="M48 -14 l4 8 9 1 -7 6 2 9 -8 -5 -8 5 2 -9 -7 -6 9 -1z" fill="#F0B23A"/></g>
+      <g transform="translate(270 168)"><path d="M0 14 L130 0 V62 H6Z" fill="#E0643E"/><path d="M0 14 L130 0 L130 8 Q118 18 106 10 Q94 20 80 12 Q66 22 52 14 Q38 24 24 16 Q12 24 0 20Z" fill="#ECEEF3"/><path d="M6 36 H130 M40 36 V62 M86 36 V62 M20 50 H130" stroke="#C24E30" stroke-width="2"/>
+        <g transform="translate(40 -26)"><rect x="0" y="10" width="30" height="24" rx="2" fill="#1D5C3A"/><path d="M0 18 L30 30 M0 26 L22 34" stroke="#F0C35A" stroke-width="3"/><rect x="12" y="10" width="6" height="24" fill="#D9483E"/><path d="M15 10 C8 0 0 4 6 10Z M15 10 C22 0 30 4 24 10Z" fill="#D9483E"/></g></g>
+    </svg></div>
     <div><div class="eyebrow">THE CHRISTMAS STORY BOOK</div><h2 style="font-size:24px">完整的聖誕故事回來了</h2></div>
     <div class="page deckle" id="fullStory"></div>
     <div class="btn-row"><button class="btn" id="btnToCert">領取收藏家證書</button></div>
@@ -1013,6 +1072,20 @@ $("#globe").addEventListener("click", () => {
   const g = $("#globe"); g.classList.remove("shaking"); void g.getBBox(); g.classList.add("shaking"); audio.play("bell");
   clearTimeout(g._t); g._t = setTimeout(() => g.classList.remove("shaking"), 2600);
 });
+
+/* 幾何聖誕拼貼磚 */
+const TILE_ART = {
+  peppermint: ['#F4B9C8', '<circle cx="50" cy="50" r="34" fill="#FFFFFF"/>' + [0, 1, 2].map((i) => `<path d="M50 50 L${50 + 34 * Math.cos(i * 2.094)} ${50 + 34 * Math.sin(i * 2.094)} A34 34 0 0 1 ${50 + 34 * Math.cos(i * 2.094 + 1.047)} ${50 + 34 * Math.sin(i * 2.094 + 1.047)}Z" fill="#D7262B"/>`).join("")],
+  candy: ['#D7262B', '<path d="M30 50 L12 36 L14 64Z M70 50 L88 36 L86 64Z" fill="#F4B9C8"/><circle cx="50" cy="50" r="20" fill="#FFFFFF"/><circle cx="50" cy="50" r="12" fill="#D4A56A"/>'],
+  bauble: ['#F4B9C8', '<rect x="43" y="16" width="14" height="9" fill="#D7262B"/><circle cx="50" cy="56" r="30" fill="#D4A56A"/><path d="M22 46 H78 M20 56 H80 M22 66 H78" stroke="#D7262B" stroke-width="6"/>'],
+  sparkle: ['#D7262B', '<path d="M50 14 Q54 46 86 50 Q54 54 50 86 Q46 54 14 50 Q46 46 50 14Z" fill="#FFFFFF"/><path d="M80 18 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z" fill="#F4B9C8"/>'],
+  tree: ['#0F5A40', '<path d="M50 12 L76 50 H64 L84 82 H16 L36 50 H24Z" fill="#F4B9C8"/><circle cx="44" cy="58" r="3" fill="#FFFFFF"/><circle cx="58" cy="70" r="3" fill="#FFFFFF"/><circle cx="52" cy="40" r="3" fill="#FFFFFF"/><rect x="45" y="82" width="10" height="8" fill="#F4B9C8"/>'],
+  flake: ['#EDE5DC', '<g stroke="#D7262B" stroke-width="7" stroke-linecap="round"><path d="M50 14 V86 M19 32 L81 68 M19 68 L81 32"/><path d="M40 20 L50 30 L60 20 M40 80 L50 70 L60 80" fill="none" stroke-width="5"/></g>'],
+  starcookie: ['#EDE5DC', '<path d="M50 12 L61 38 L89 40 L67 58 L74 86 L50 71 L26 86 L33 58 L11 40 L39 38Z" fill="#D7262B" stroke="#D7262B" stroke-width="4" stroke-linejoin="round"/><path d="M32 52 L68 40 M36 62 L70 50" stroke="#0F5A40" stroke-width="2.5"/>'],
+  cane: ['#0F5A40', '<path d="M40 86 V34 a14 14 0 0 1 28 0 v6" stroke="#FFFFFF" stroke-width="12" fill="none" stroke-linecap="round"/><path d="M40 86 V34 a14 14 0 0 1 28 0 v6" stroke="#D7262B" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="7 7"/>']
+};
+const tileSVG = (k) => `<svg viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" fill="${TILE_ART[k][0]}"/>${TILE_ART[k][1]}</svg>`;
+document.querySelectorAll("[data-mosaic]").forEach((el) => { el.innerHTML = el.dataset.mosaic.split(",").map(tileSVG).join(""); });
 
 /* 每張卡片的角落裝飾：拐杖糖、禮物、手套 */
 const DECO = {
@@ -1492,10 +1565,18 @@ function finishStage(id, stars) {
 
 function starRow(n) { return `<div class="stars" aria-label="${n} 顆雪花">${[1, 2, 3].map((i) => `<svg style="color:${i <= n ? "var(--gold)" : "var(--line)"}"><use href="#star" fill="currentColor"/></svg>`).join("")}</div>`; }
 
+const STICKERS = `
+  <svg class="stk s-gift" viewBox="0 0 60 64"><rect x="6" y="20" width="48" height="42" rx="4" fill="#0F5A40"/><rect x="2" y="14" width="56" height="12" rx="3" fill="#147050"/><rect x="26" y="14" width="8" height="48" fill="#B8322A"/><g fill="#D7262B"><circle cx="14" cy="36" r="2.4"/><circle cx="44" cy="44" r="2.4"/><circle cx="16" cy="54" r="2.4"/><circle cx="46" cy="30" r="2.4"/></g><path d="M30 14 C20 0 8 6 16 14Z M30 14 C40 0 52 6 44 14Z" fill="#B8322A"/></svg>
+  <svg class="stk s-holly" viewBox="0 0 80 60"><path d="M40 34 C24 40 8 30 4 16 C12 20 18 16 20 10 C26 18 34 16 40 34Z" fill="#0F5A40"/><path d="M42 32 C46 14 62 6 78 10 C72 14 74 22 78 26 C68 28 64 34 42 32Z" fill="#147050"/><circle cx="38" cy="36" r="7" fill="#D7262B"/><circle cx="48" cy="38" r="6.5" fill="#D7262B"/><circle cx="42" cy="45" r="6" fill="#B8322A"/><circle cx="36" cy="34" r="2" fill="#FFFFFF" opacity=".7"/></svg>
+  <svg class="stk s-hat" viewBox="0 0 80 60"><path d="M10 44 Q20 6 52 8 Q70 10 72 30 Q60 22 54 30 Z" fill="#D7262B"/><g fill="#FFFFFF" opacity=".85"><circle cx="30" cy="26" r="2"/><circle cx="42" cy="18" r="2"/><circle cx="50" cy="30" r="2"/></g><path d="M6 46 q6 -8 12 0 q6 -8 12 0 q6 -8 12 0 q6 -8 12 0 q6 -8 12 0 v8 h-60z" fill="#F2F2F2"/><circle cx="72" cy="32" r="7" fill="#F2F2F2"/></svg>
+  <svg class="stk s-cane" viewBox="0 0 40 80"><path d="M10 76 V24 a12 12 0 0 1 24 0 v6" stroke="#FFFFFF" stroke-width="10" fill="none" stroke-linecap="round"/><path d="M10 76 V24 a12 12 0 0 1 24 0 v6" stroke="#0F5A40" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="6 6"/><path d="M10 76 V24 a12 12 0 0 1 24 0 v6" stroke="#D7262B" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="6 6" stroke-dashoffset="6" opacity=".9"/></svg>
+  <svg class="stk s-socks" viewBox="0 0 70 70"><g transform="rotate(-12 20 30)"><path d="M8 6 h20 v34 l12 10 q6 6 -2 12 l-16 -8 q-14 -6 -14 -18z" fill="#0F5A40"/><rect x="6" y="2" width="24" height="9" rx="2" fill="#D7262B"/><path d="M16 26 c-3 -4 2 -7 4 -3 c2 -4 7 -1 4 3 l-4 4z" fill="#FFFFFF"/></g><g transform="translate(26 6) rotate(8 20 30)"><path d="M8 6 h20 v34 l12 10 q6 6 -2 12 l-16 -8 q-14 -6 -14 -18z" fill="#147050"/><rect x="6" y="2" width="24" height="9" rx="2" fill="#D7262B"/><path d="M12 22 l4 4 4 -4 4 4 4 -4" stroke="#FFFFFF" stroke-width="1.6" fill="none"/></g></svg>
+  <svg class="stk s-orn" viewBox="0 0 60 66"><rect x="24" y="2" width="12" height="9" rx="2" fill="#F0B23A"/><circle cx="30" cy="38" r="26" fill="#D7262B"/><g stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round"><path d="M30 24 V52 M18 31 L42 45 M18 45 L42 31"/></g></svg>
+  <svg class="stk s-flake" viewBox="0 0 40 40"><g stroke="#D7262B" stroke-width="2.4" stroke-linecap="round" fill="none"><path d="M20 3 V37 M5 11 L35 29 M5 29 L35 11"/><path d="M15 6 L20 10 L25 6 M15 34 L20 30 L25 34"/></g></svg>`;
 function openReward(id, stars, viewOnly) {
   const s = stage(id), c = content(id);
   const ov = overlay(`
-    <div class="modal" style="margin-top:56px">
+    <div class="modal reward" style="margin-top:56px">${STICKERS}
       <div class="seal-big ${id === 5 ? "gold" : ""}">${esc(s.char)}</div>
       <p class="eyebrow">${id === 5 ? "最後一片故事" : `第 ${id} 片故事碎片`}</p>
       <h3>${id === 5 ? "你打開了 DeDe 的禮物！" : `取得通關字「${esc(s.char)}」`}</h3>
@@ -1616,7 +1697,7 @@ function renderCert() {
 `;
   if (S.redeemedAt) { sb.innerHTML = head + `<p class="note" style="text-align:center">館長已在 ${fmtDate(S.redeemedAt)} 蓋章，禮物兌換完成。謝謝參加！</p>`; }
   else {
-    sb.innerHTML = head + `<b style="font-size:15px;color:var(--red)">館長蓋章</b><p class="note">由館長輸入 PIN 蓋章，蓋章後證書上會出現「已兌換」圓戳章。</p>
+    sb.innerHTML = head + `<b style="font-size:15px;color:var(--red)">館長蓋章</b><p class="note">由館長輸入 PIN 蓋章，蓋章後證書上會出現金色的「已兌換」聖誕星星章。</p>
       <form class="row" id="redeemForm" novalidate><input class="input" id="staffPin" type="password" inputmode="numeric" maxlength="8" placeholder="館長 PIN" autocomplete="off"><button class="btn small" type="submit">蓋章</button></form><p class="err" id="pinErr"></p>`;
     $("#redeemForm").addEventListener("submit", (e) => {
       e.preventDefault();
@@ -1658,15 +1739,22 @@ const SANTA_PEEK = `<path d="M8 230 V150 Q10 108 74 106 Q142 108 148 158 V230Z" 
 const CERT_SANTA = `<svg class="cert-santa" viewBox="0 0 160 230" aria-hidden="true">${SANTA_PEEK}</svg>`;
 let stampN = 0;
 function stampSVG(ts) {
-  const id = "ring" + (++stampN), d = new Date(ts);
-  return `<svg class="seal-stamp" viewBox="0 0 120 120" aria-label="已兌換 ${fmtDate(ts)}">
-    <defs><path id="${id}" d="M60 60 m-41 0 a41 41 0 1 1 82 0 a41 41 0 1 1 -82 0"/></defs>
-    <circle cx="60" cy="60" r="54" fill="none" stroke="#C8302A" stroke-width="4"/><circle cx="60" cy="60" r="49" fill="none" stroke="#C8302A" stroke-width="1.2"/>
-    <circle cx="60" cy="60" r="31" fill="none" stroke="#C8302A" stroke-width="1.5"/>
-    <text font-size="10.5" font-weight="700" fill="#C8302A" letter-spacing="1.6" font-family="Noto Sans TC, sans-serif"><textPath href="#${id}" startOffset="2%">★ SWSH LIBRARY ★ 四維圖書館 ★ 聖誕閱讀闖關</textPath></text>
-    <text x="60" y="58" text-anchor="middle" font-size="16" font-weight="700" fill="#C8302A" font-family="LXGW WenKai TC, serif">已兌換</text>
-    <text x="60" y="73" text-anchor="middle" font-size="9" font-weight="700" fill="#C8302A" font-family="Noto Sans TC, sans-serif">${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}</text>
-    <path d="M44 80 h32" stroke="#C8302A" stroke-width="1.2"/></svg>`;
+  const d = new Date(ts), g = "gs" + (++stampN);
+  return `<svg class="seal-stamp" viewBox="0 0 120 124" aria-label="已兌換 ${fmtDate(ts)}">
+    <defs><linearGradient id="${g}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FBE29A"/><stop offset=".55" stop-color="#E9B949"/><stop offset="1" stop-color="#C99A2E"/></linearGradient></defs>
+    <g fill="#E9B949"><path d="M12 24 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z"/><path d="M106 18 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z"/><path d="M108 92 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z"/><circle cx="14" cy="96" r="2.2"/><circle cx="96" cy="8" r="1.8"/></g>
+    <path d="M60.0 14.0 L74.1 42.6 L105.7 47.2 L82.8 69.4 L88.2 100.8 L60.0 86.0 L31.8 100.8 L37.2 69.4 L14.3 47.2 L45.9 42.6Z" fill="url(#${g})" stroke="#B8862F" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M60.0 24.0 L71.2 46.6 L96.1 50.3 L78.1 67.9 L82.3 92.7 L60.0 81.0 L37.7 92.7 L41.9 67.9 L23.9 50.3 L48.8 46.6Z" fill="none" stroke="#FFF3C9" stroke-width="1.6" stroke-dasharray="3 3" stroke-linejoin="round"/>
+    <g transform="rotate(18 64 16)"><path d="M48 22 Q58 -4 80 6 Q72 10 74 20Z" fill="#D9483E"/><rect x="45" y="17" width="32" height="8" rx="4" fill="#FFFFFF"/><circle cx="81" cy="7" r="5" fill="#FFFFFF"/></g>
+    <ellipse cx="51" cy="52" rx="3.2" ry="4" fill="#5E3B12"/><ellipse cx="69" cy="52" rx="3.2" ry="4" fill="#5E3B12"/>
+    <circle cx="52.2" cy="50.6" r="1.1" fill="#FFFFFF"/><circle cx="70.2" cy="50.6" r="1.1" fill="#FFFFFF"/>
+    <ellipse cx="44" cy="59" rx="4.5" ry="2.8" fill="#F29C8E" opacity=".75"/><ellipse cx="76" cy="59" rx="4.5" ry="2.8" fill="#F29C8E" opacity=".75"/>
+    <path d="M55 58 Q60 63 65 58" stroke="#5E3B12" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    <path d="M22 72 L98 72 L94 81 L98 90 L22 90 L26 81Z" fill="#B8862F"/>
+    <path d="M28 72 H92 V88 H28Z" fill="#D4A23C"/>
+    <text x="60" y="85.5" text-anchor="middle" font-size="12.5" font-weight="900" fill="#FFFFFF" font-family="Chiron GoRound TC, Noto Sans TC, sans-serif" letter-spacing="2">已兌換</text>
+    <text x="60" y="104" text-anchor="middle" font-size="8.5" font-weight="700" fill="#A8781F" font-family="Noto Sans TC, sans-serif">${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}</text>
+  </svg>`;
 }
 
 /* ================= 小工具 ================= */
