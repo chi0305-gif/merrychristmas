@@ -1147,7 +1147,7 @@ function renderHome() {
   $("#btnStart").textContent = S.team ? "看序章" : "開始冒險";
   $("#btnStart").hidden = !!S.team;
 }
-$("#btnStart").onclick = () => { audio.unlock(); renderPrologue(); show("prologue"); };
+$("#btnStart").onclick = () => { audio.unlock(); audio.play("go"); renderPrologue(); show("prologue"); };
 $("#btnContinue").onclick = () => { audio.unlock(); show(S.finishedAt ? "cert" : "map"); };
 
 function renderPrologue() {
@@ -1779,6 +1779,7 @@ const audio = (() => {
     tap: () => note(880, 0, 0.12, "triangle", 0.08),
     step: () => { note(1976, 0, 0.09, "triangle", 0.05); note(2637, 0.015, 0.07, "sine", 0.03); },
     step2: () => { note(1760, 0, 0.09, "triangle", 0.05); note(2349, 0.015, 0.07, "sine", 0.03); },
+    go: () => { [784, 988, 1175, 1568].forEach((f, i) => { note(f, i * 0.07, 0.45, "sine", 0.13); note(f * 2, i * 0.07 + 0.01, 0.2, "triangle", 0.03); }); [2637, 3136, 2794, 3520].forEach((f, i) => note(f, 0.3 + i * 0.05, 0.25, "sine", 0.04)); },
     bell: () => { note(1319, 0, 0.5, "sine", 0.12); note(1760, 0.06, 0.6, "sine", 0.08); },
     boop: () => { note(392, 0, 0.18, "triangle", 0.12); note(523, 0.08, 0.2, "triangle", 0.1); },
     paper: () => { note(520, 0, 0.1, "triangle", 0.06); note(660, 0.05, 0.12, "triangle", 0.06); },
