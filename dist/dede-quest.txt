@@ -526,11 +526,15 @@ details.cb[open] summary { margin-bottom: 8px; }
 /* ---------- 證書（粉紅聖誕花紋 + 探頭聖誕老人） ---------- */
 .cert2 { position: relative; border-radius: 14px; padding: 18px; background-color: #F6C4CB; background-size: 110px 110px; box-shadow: 0 14px 30px -14px rgba(0,0,0,.45); overflow: hidden; }
 .cert-in { position: relative; background: #FFF6F4; border: 3px solid #D9483E; outline: 1px solid #D9483E; outline-offset: -9px; padding: 24px 16px 18px; display: grid; justify-items: center; text-align: center; gap: 6px; min-height: 560px; }
-.cert-en { font-family: "Mountains of Christmas", "LXGW WenKai TC", cursive; font-weight: 700; font-size: 23px; color: #D9483E; line-height: 1.1; margin-top: 0; white-space: nowrap; letter-spacing: .02em; }
-.cert-in h2 { font-size: 30px; color: #B8322A; letter-spacing: .12em; text-shadow: 2px 2px 0 #FFFFFF, 3px 3px 0 #F6C4CB; }
+.cert-en { font-family: "Mountains of Christmas", "LXGW WenKai TC", cursive; font-weight: 700; font-size: 23px; color: #2E5B45; line-height: 1.1; margin-top: 0; white-space: nowrap; letter-spacing: .02em; }
+.cert-in h2.cert-title { position: relative; margin: 6px 0 2px; }
+.cert-title span { position: relative; z-index: 1; display: inline-block; background: #CC1F26; color: #FFF8EF; font-family: var(--font-cute); font-weight: 900; font-size: 23px; letter-spacing: .14em; padding: 6px 16px 6px 20px; border-radius: 4px; box-shadow: 0 3px 0 #9E1A1F; }
+.cert-title::before, .cert-title::after { content: ""; position: absolute; top: 11px; width: 20px; height: 30px; background: #9E1A1F; }
+.cert-title::before { left: -12px; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 40% 50%); }
+.cert-title::after { right: -12px; clip-path: polygon(0 0, 100% 0, 60% 50%, 100% 100%, 0 100%); }
 .cert-in .to { font-size: 14px; color: var(--ink); margin-top: 6px; letter-spacing: .2em; }
 .cert-in .cls { font-size: 14px; color: var(--ink-soft); }
-.cert-in .who { font-family: var(--font-story); font-size: 34px; color: #D9483E; border-bottom: 2px solid #E9A3AE; padding: 0 22px 2px; line-height: 1.3; max-width: 100%; overflow-wrap: anywhere; }
+.cert-in .who { font-family: var(--font-story); font-size: 34px; color: #2E5B45; border-bottom: 2px solid #B9D3C2; padding: 0 22px 2px; line-height: 1.3; max-width: 100%; overflow-wrap: anywhere; }
 .cert-in .desc { font-family: var(--font-story); font-size: 16px; line-height: 1.75; max-width: 18em; margin-top: 4px; }
 .cert-in .chars-row span { background: #D9483E; width: 32px; height: 32px; }
 .cert-in .chars-row span:last-child { background: var(--gold); }
@@ -1219,6 +1223,23 @@ function renderMap() {
   else tip.textContent = `點地圖上閃紅光的第${NUM[current]}關開始挑戰！`;
 }
 
+/* 聖誕老人到站時喊「Ho Ho Ho!」：先用手機的語音（較像真人），0.6 秒內沒開始說話就改播合成聲 */
+function hoHoHo() {
+  if (S.snd === 2) return;
+  let started = false;
+  try {
+    if ("speechSynthesis" in window && window.SpeechSynthesisUtterance) {
+      const u = new SpeechSynthesisUtterance("Ho, ho, ho!");
+      u.lang = "en-US"; u.pitch = 0.2; u.rate = 0.75; u.volume = 1;
+      const v = speechSynthesis.getVoices().find((x) => /^en/i.test(x.lang) && /male|daniel|fred|alex|google uk english male/i.test(x.name)) || speechSynthesis.getVoices().find((x) => /^en/i.test(x.lang));
+      if (v) u.voice = v;
+      u.onstart = () => { started = true; };
+      speechSynthesis.cancel(); speechSynthesis.speak(u);
+    }
+  } catch (e) {}
+  setTimeout(() => { if (!started) { try { speechSynthesis.cancel(); } catch (e) {} audio.hoho(); } }, 600);
+}
+
 /* 聖誕老人：站在目前關卡上方，過關後沿著小路走到下一關 */
 const SANTA_SVG = `<path id="trail" d="M84 478 C 170 478, 270 456, 270 392 S 92 352, 92 300 S 270 266, 270 210 S 180 166, 180 110" fill="none" stroke="none"/>
 <g id="santa" class="santa" pointer-events="none"><g id="santaFlip"><g class="bodybob">
@@ -1258,17 +1279,18 @@ function moveSanta(target) {
   const say = () => { santa.classList.add("say"); setTimeout(() => santa.classList.remove("say"), 2200); };
   const from = Math.min(S.santaAt || 1, target);
   cancelAnimationFrame(santaAnim);
-  if (from === target || reduce) { place(trailLens[target], 1); S.santaAt = target; save(); if (from !== target) say(); return; }
+  if (from === target || reduce) { place(trailLens[target], 1); S.santaAt = target; save(); if (from !== target) { say(); hoHoHo(); } return; }
   S.santaAt = target; save();
   const a = trailLens[from], b = trailLens[target], dur = 1700 * (target - from);
-  let t0 = 0, lastX = null;
+  let t0 = 0, lastX = null, lastStep = 0, stepN = 0;
   santa.classList.add("walking"); place(a, 1);
   const stepFn = (t) => {
     if (!t0) t0 = t;
     const u = Math.min(1, (t - t0) / dur), e = u < .5 ? 2 * u * u : 1 - (-2 * u + 2) ** 2 / 2, len = a + (b - a) * e;
     const x = trail.getPointAtLength(len).x; const dir = lastX == null ? 1 : Math.sign(x - lastX) || 0; lastX = x;
     place(len, dir);
-    if (u < 1) santaAnim = requestAnimationFrame(stepFn); else { santa.classList.remove("walking"); say(); audio.play("ok"); }
+    if (t - lastStep > 300) { lastStep = t; audio.play(stepN++ % 2 ? "step" : "step2"); }
+    if (u < 1) santaAnim = requestAnimationFrame(stepFn); else { santa.classList.remove("walking"); say(); hoHoHo(); }
   };
   setTimeout(() => { santaAnim = requestAnimationFrame(stepFn); }, 450);
 }
@@ -1681,7 +1703,7 @@ function renderCert() {
     <div class="cert-in">
       <svg class="cert-badge" viewBox="0 0 120 130" aria-hidden="true">${SWSH_BADGE}</svg>
       <p class="cert-en">Christmas Story Collector</p>
-      <h2>聖誕故事收藏家</h2>
+      <h2 class="cert-title"><span>聖誕故事收藏家</span></h2>
       <p class="to">頒 發 給</p>
       <p class="cls">${esc(S.cls ? `${S.cls} 班　${S.seat} 號` : "")}</p>
       <div class="who">${esc(S.name || S.team)}</div>
@@ -1750,7 +1772,7 @@ function stampSVG(ts) {
     <defs><path id="${id}" d="M60 60 m-41 0 a41 41 0 1 1 82 0 a41 41 0 1 1 -82 0"/></defs>
     <circle cx="60" cy="60" r="54" fill="none" stroke="#B8862F" stroke-width="4"/><circle cx="60" cy="60" r="49" fill="none" stroke="#B8862F" stroke-width="1.2"/>
     <circle cx="60" cy="60" r="31" fill="none" stroke="#B8862F" stroke-width="1.5"/>
-    <text font-size="10.5" font-weight="700" fill="#B8862F" letter-spacing="1.6" font-family="Noto Sans TC, sans-serif"><textPath href="#${id}" startOffset="2%">★ SWSH LIBRARY ★ 四維圖書館 ★ 聖誕閱讀闖關</textPath></text>
+    <text font-size="10.5" font-weight="700" fill="#B8862F" letter-spacing="1.6" font-family="Noto Sans TC, sans-serif"><textPath href="#${id}" startOffset="0" textLength="248" lengthAdjust="spacing">★ SWSH LIBRARY ★ 四維圖書館</textPath></text>
     <text x="60" y="58" text-anchor="middle" font-size="16" font-weight="700" fill="#B8862F" font-family="LXGW WenKai TC, serif">已兌換</text>
     <text x="60" y="73" text-anchor="middle" font-size="9" font-weight="700" fill="#B8862F" font-family="Noto Sans TC, sans-serif">${d.getFullYear()}.${d.getMonth() + 1}.${d.getDate()}</text>
     <path d="M44 80 h32" stroke="#B8862F" stroke-width="1.2"/></svg>`;
@@ -1771,6 +1793,8 @@ const audio = (() => {
   };
   const SFX = {
     tap: () => note(880, 0, 0.12, "triangle", 0.08),
+    step: () => { note(1976, 0, 0.09, "triangle", 0.05); note(2637, 0.015, 0.07, "sine", 0.03); },
+    step2: () => { note(1760, 0, 0.09, "triangle", 0.05); note(2349, 0.015, 0.07, "sine", 0.03); },
     bell: () => { note(1319, 0, 0.5, "sine", 0.12); note(1760, 0.06, 0.6, "sine", 0.08); },
     boop: () => { note(392, 0, 0.18, "triangle", 0.12); note(523, 0.08, 0.2, "triangle", 0.1); },
     paper: () => { note(520, 0, 0.1, "triangle", 0.06); note(660, 0.05, 0.12, "triangle", 0.06); },
@@ -1779,7 +1803,26 @@ const audio = (() => {
     start: () => [523, 659, 784, 1047].forEach((f, i) => note(f, i * 0.09, 0.4, "sine", 0.14)),
     win: () => [659, 659, 659, 0, 659, 659, 659, 0, 659, 784, 523, 587, 659].forEach((f, i) => f && note(f, i * 0.13, 0.32, "sine", 0.13))
   };
-  return { unlock, ctx: () => ctx, play(n) { if (S.snd === 2) return; unlock(); if (ctx && SFX[n]) try { SFX[n](); } catch (e) {} } };
+  /* 合成的低沉「Ho Ho Ho」：鋸齒波人聲＋母音共振（o）＋開頭的氣音（h） */
+  const hoho = () => {
+    if (!ctx) return;
+    const noise = ctx.createBuffer(1, ctx.sampleRate * 0.1, ctx.sampleRate), nd = noise.getChannelData(0);
+    for (let i = 0; i < nd.length; i++) nd[i] = (Math.random() * 2 - 1) * (1 - i / nd.length);
+    [0, 0.42, 0.84].forEach((dt, i) => {
+      const t = ctx.currentTime + 0.05 + dt, f0 = [150, 145, 132][i], len = i === 2 ? 0.5 : 0.3;
+      const o = ctx.createOscillator(); o.type = "sawtooth"; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f0 * 0.78, t + len);
+      const vib = ctx.createOscillator(), vg = ctx.createGain(); vib.frequency.value = 6; vg.gain.value = 3; vib.connect(vg); vg.connect(o.frequency);
+      const g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(0.5, t + 0.05); g.gain.setValueAtTime(0.5, t + len * 0.6); g.gain.exponentialRampToValueAtTime(0.001, t + len);
+      [[480, 4, 1], [820, 6, 0.45], [2600, 8, 0.12]].forEach(([fq, q, v]) => {
+        const bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = fq; bp.Q.value = q;
+        const bg = ctx.createGain(); bg.gain.value = v; o.connect(bp); bp.connect(bg); bg.connect(g);
+      });
+      g.connect(ctx.destination); o.start(t); vib.start(t); o.stop(t + len + 0.05); vib.stop(t + len + 0.05);
+      const src = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), ng = ctx.createGain();
+      src.buffer = noise; hp.type = "highpass"; hp.frequency.value = 1200; ng.gain.value = 0.08; src.connect(hp); hp.connect(ng); ng.connect(ctx.destination); src.start(t - 0.06);
+    });
+  };
+  return { unlock, ctx: () => ctx, hoho() { if (S.snd === 2) return; unlock(); try { hoho(); } catch (e) {} }, play(n) { if (S.snd === 2) return; unlock(); if (ctx && SFX[n]) try { SFX[n](); } catch (e) {} } };
 })();
 
 /* 聖誕音樂：用 WebAudio 即時演奏公版聖誕歌曲（Jingle Bells、We Wish You a Merry Christmas），不需音樂檔 */
