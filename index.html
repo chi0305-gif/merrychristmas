@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>DeDe 聖誕閱讀探險</title>
+<title>叮叮噹聖誕閱讀闖關</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -178,6 +178,56 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .rules { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; counter-reset: r; }
 .rules li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; }
 .rules li::before { counter-increment: r; content: counter(r); flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--green-soft); color: var(--green); font-weight: 700; font-size: 13px; display: grid; place-items: center; margin-top: 2px; }
+/* ---------- 闖關說明（燈串彩球） ---------- */
+.rulebox { position: relative; border-radius: 22px; padding: 30px 16px 18px;
+  background: radial-gradient(circle at 12% 30%, rgba(255,255,255,.9) 0 2px, transparent 3px) 0 0 / 46px 46px,
+              radial-gradient(circle at 60% 70%, rgba(255,255,255,.9) 0 1.5px, transparent 2.5px) 0 0 / 38px 38px,
+              linear-gradient(160deg, #DCEBE2, #EEF5F0); box-shadow: inset 0 0 0 2px #C9DCCF; }
+.ribbon { position: absolute; top: -16px; left: 50%; transform: translateX(-50%); z-index: 2; }
+.ribbon span { position: relative; display: block; background: var(--red); color: #FFF8EF; font-family: var(--font-story); font-weight: 700; font-size: 19px; letter-spacing: .2em; padding: 6px 26px 6px 30px; border-radius: 4px; box-shadow: 0 4px 0 var(--red-deep); white-space: nowrap; }
+.ribbon::before, .ribbon::after { content: ""; position: absolute; top: 10px; width: 22px; height: 28px; background: var(--red-deep); z-index: -1; }
+.ribbon::before { left: -14px; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%, 40% 50%); }
+.ribbon::after { right: -14px; clip-path: polygon(0 0, 100% 0, 60% 50%, 100% 100%, 0 100%); }
+.garland { position: relative; height: 40px; margin: 0 -6px 6px; }
+.garland svg { position: absolute; inset: 0; width: 100%; height: 34px; }
+.garland i { position: absolute; top: 14px; width: 16px; height: 16px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.7), var(--c) 45%); box-shadow: 0 3px 6px rgba(0,0,0,.2); animation: swing 2.4s ease-in-out infinite alternate; transform-origin: 50% -8px; }
+.garland i::before { content: ""; position: absolute; top: -4px; left: 5px; width: 6px; height: 5px; background: var(--gold); border-radius: 2px; }
+@keyframes swing { from { transform: rotate(-10deg); } to { transform: rotate(10deg); } }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; position: relative; }
+.steps::before { content: ""; position: absolute; left: 23px; top: 20px; bottom: 20px; border-left: 3px dotted var(--gold); }
+.steps li { display: flex; gap: 14px; align-items: center; position: relative; }
+.steps .orb { flex: none; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; position: relative;
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.45), var(--c) 55%); box-shadow: 0 4px 10px rgba(0,0,0,.18), inset 0 -4px 0 rgba(0,0,0,.12); }
+.steps .orb::before { content: ""; position: absolute; top: -6px; width: 12px; height: 8px; border-radius: 3px 3px 1px 1px; background: var(--gold); }
+.steps .orb svg { width: 24px; height: 24px; fill: none; stroke: #FFF8EF; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.steps li > div { flex: 1; min-width: 0; background: var(--card); border-radius: 14px; padding: 8px 14px; box-shadow: 0 2px 0 #C9DCCF; }
+.steps b { font-family: var(--font-story); font-size: 17px; display: block; line-height: 1.4; }
+.steps p { font-size: 14px; color: var(--ink-soft); line-height: 1.5; }
+.steps li:nth-child(odd) .orb { animation: jingle 3s ease-in-out infinite; }
+.steps li:nth-child(even) .orb { animation: jingle 3s ease-in-out -1.5s infinite; }
+@keyframes jingle { 0%, 80%, 100% { transform: rotate(0); } 85% { transform: rotate(-12deg); } 90% { transform: rotate(10deg); } 95% { transform: rotate(-5deg); } }
+/* ---------- 報到卡（禮物吊牌） ---------- */
+.tag { position: relative; display: grid; gap: 14px; margin-top: 26px; padding: 40px 18px 22px; border-radius: 22px;
+  background: linear-gradient(90deg, transparent 46%, rgba(194,58,46,.92) 46% 54%, transparent 54%) top / 100% 30px no-repeat,
+              repeating-linear-gradient(0deg, transparent 0 22px, rgba(199,154,59,.07) 22px 23px), #FFFDF8;
+  box-shadow: 0 0 0 2px var(--gold), 0 0 0 7px #FFFDF8, 0 0 0 9px var(--red), 0 18px 30px -16px rgba(0,0,0,.35); }
+.tag::before { content: ""; position: absolute; top: 12px; left: 16px; width: 14px; height: 14px; border-radius: 50%; background: var(--paper); box-shadow: inset 0 0 0 3px var(--gold); }
+.tag .bow { position: absolute; top: -30px; left: 50%; transform: translateX(-50%); width: 108px; filter: drop-shadow(0 4px 3px rgba(0,0,0,.2)); }
+.tag-head { text-align: center; display: grid; gap: 4px; }
+.tag-to { font-size: 12px; font-weight: 700; letter-spacing: .25em; color: var(--green); }
+.tag-head h3 { font-size: 26px; color: var(--red); }
+.tag-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.tag-fields .full { grid-column: 1 / -1; }
+.tag .input { background: #FFFFFF; border: 2px dashed #D9C7A4; border-radius: 14px; }
+.tag .input:focus { border: 2px solid var(--green); box-shadow: 0 0 0 4px var(--green-soft); }
+.fi { display: inline-flex; align-items: center; gap: 6px; color: var(--green); }
+.fi svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn.candy { position: relative; overflow: hidden; font-size: 19px; padding: 16px 26px;
+  background: repeating-linear-gradient(-45deg, #C23A2E 0 16px, #D8493C 16px 32px); background-size: 45px 45px; animation: candy 1.2s linear infinite; }
+@keyframes candy { to { background-position: 45px 0; } }
+.tag .peek { position: absolute; right: -8px; bottom: -14px; width: 66px; transform: rotate(-8deg); pointer-events: none; }
+.tag .err { min-height: 0; text-align: center; }
+.tag .err:empty { display: none; }
 label.field { display: grid; gap: 6px; font-weight: 700; font-size: 15px; }
 .input {
   width: 100%; font: inherit; font-size: 18px; padding: 12px 16px; border-radius: 14px;
@@ -518,7 +568,7 @@ details.cb[open] summary { margin-bottom: 8px; }
     <div class="cover">
       <div class="lights" aria-hidden="true" style="width:100%"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       <div class="eyebrow" id="eventName"></div>
-      <svg class="globe" viewBox="0 0 320 320" role="img" aria-label="戴聖誕帽的臘腸狗 DeDe 坐在打開的故事書上">
+      <svg class="globe" viewBox="0 0 320 320" role="img" aria-label="聖誕老人站在打開的故事書上揮手">
         <defs><clipPath id="dome"><circle cx="160" cy="150" r="138"/></clipPath></defs>
         <circle cx="160" cy="150" r="138" fill="#A9C2D4"/>
         <g clip-path="url(#dome)">
@@ -535,11 +585,26 @@ details.cb[open] summary { margin-bottom: 8px; }
         <path d="M38 254 Q98 222 160 248 L160 266 Q98 240 38 268z" fill="#FFFDF8"/>
         <path d="M282 254 Q222 222 160 248 L160 266 Q222 240 282 268z" fill="#F1F5F7"/>
         <g stroke="#DCE8EE" stroke-width="2" fill="none"><path d="M58 250 Q100 232 146 250"/><path d="M262 250 Q220 232 174 250"/></g>
-        <use href="#dede" x="70" y="160" width="170" height="99"/>
+        <g transform="translate(196 196)"><path d="M0 52 Q-6 22 14 14 Q10 6 20 6 Q30 6 26 14 Q46 22 40 52Z" fill="#9C6B3C"/><path d="M14 14 Q20 18 26 14" stroke="#C23A2E" stroke-width="3" fill="none"/><rect x="2" y="30" width="16" height="14" rx="2" fill="#2E5B45"/><rect x="8" y="30" width="4" height="14" fill="#C79A3B"/></g>
+        <g class="santa" transform="translate(110 143) scale(1.95)">
+          <ellipse cx="25" cy="58" rx="14" ry="3" fill="#3B2F2A" opacity=".18"/>
+          <g class="legs"><rect class="l" x="16" y="44" width="7" height="13" rx="3" fill="#2A1B14"/><rect class="r" x="27" y="44" width="7" height="13" rx="3" fill="#2A1B14"/></g>
+          <path d="M7 34 Q4 37 8 40" stroke="#C23A2E" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <path d="M9 48 Q7 29 25 27 Q43 29 41 48Z" fill="#C23A2E"/>
+          <rect x="9" y="38" width="32" height="5" fill="#2A1B14"/><rect x="21" y="37.5" width="8" height="6" rx="1" fill="none" stroke="#C79A3B" stroke-width="1.8"/>
+          <rect x="8" y="45" width="34" height="5" rx="2.5" fill="#FFF8EF"/><rect x="23" y="28" width="4" height="10" fill="#FFF8EF"/>
+          <g class="arm"><path d="M40 34 Q47 28 47 20" stroke="#C23A2E" stroke-width="6" stroke-linecap="round" fill="none"/><circle cx="47" cy="19" r="3.6" fill="#2E5B45"/></g>
+          <circle cx="25" cy="19" r="9" fill="#F6CDAE"/>
+          <path d="M14 19 Q13 33 25 35 Q37 33 36 19 Q31 25 25 24 Q19 25 14 19Z" fill="#FFFFFF"/>
+          <path d="M19 23 Q25 20 31 23 Q25 26 19 23Z" fill="#F2F2F2"/>
+          <circle cx="21.5" cy="17" r="1.5" fill="#2A1B14"/><circle cx="28.5" cy="17" r="1.5" fill="#2A1B14"/><circle cx="25" cy="21" r="2" fill="#E88D7D"/>
+          <circle cx="18" cy="20" r="2" fill="#F2A08F" opacity=".7"/><circle cx="32" cy="20" r="2" fill="#F2A08F" opacity=".7"/>
+          <path d="M15 13 Q19 -2 33 2 Q41 6 43 16" fill="#C23A2E"/><rect x="14" y="10" width="22" height="6" rx="3" fill="#FFFFFF"/><circle cx="43" cy="16" r="4" fill="#FFFFFF"/>
+        </g>
         <rect x="60" y="290" width="200" height="18" rx="6" fill="#2E5B45"/>
         <text x="160" y="303.5" text-anchor="middle" font-size="10" fill="#FFF8EF" font-family="Noto Sans TC, sans-serif" letter-spacing="2">CHRISTMAS STORY BOOK</text>
       </svg>
-      <h1>聖誕故事失竊事件<span class="sub">DeDe 的最後任務</span></h1>
+      <h1>叮叮噹！聖誕閱讀闖關<span class="sub">2026 的最後任務</span></h1>
       <p class="slogan" id="slogan"></p>
       <div class="banner" id="pendingBanner" hidden></div>
       <div class="facts">
@@ -558,32 +623,47 @@ details.cb[open] summary { margin-bottom: 8px; }
     <div class="page deckle">
       <div class="story" id="prologueText"></div>
     </div>
-    <div class="page">
-      <h3 style="font-size:20px;margin-bottom:10px">冒險規則</h3>
-      <ol class="rules">
-        <li>用自己的班級、座號、姓名登入。</li>
-        <li>依照地圖順序闖關，完成一關才會打開下一關。</li>
-        <li>讀完故事、解開題目，取得一個「通關字」。</li>
-        <li>可以到每關建議的地點去找找相關的書與佈置。</li>
-        <li>完成後回到圖書館聖誕樹旁，出示完賽畫面兌換小禮物。</li>
+    <div class="rulebox">
+      <div class="ribbon"><span>闖關說明</span></div>
+      <div class="garland" aria-hidden="true"><svg viewBox="0 0 320 34" preserveAspectRatio="none"><path d="M0 4 Q80 34 160 10 T320 6" stroke="#2E5B45" stroke-width="9" fill="none" stroke-linecap="round"/><path d="M0 4 Q80 34 160 10 T320 6" stroke="#3A6E55" stroke-width="3" fill="none" stroke-dasharray="2 6"/></svg>
+        <i style="left:12%;--c:#C23A2E"></i><i style="left:30%;--c:#C79A3B;animation-delay:-.6s"></i><i style="left:50%;--c:#6E8EA6;animation-delay:-1.2s"></i><i style="left:70%;--c:#C23A2E;animation-delay:-.3s"></i><i style="left:88%;--c:#C79A3B;animation-delay:-.9s"></i></div>
+      <ol class="steps">
+        <li><span class="orb" style="--c:#C23A2E"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.4"/><path d="M5.5 16.5c.8-1.8 2-2.6 3.5-2.6s2.7.8 3.5 2.6M14.5 10h4M14.5 13.5h3"/></svg></span>
+          <div><b>登入報到</b><p>寫下班級、座號和姓名</p></div></li>
+        <li><span class="orb" style="--c:#2E5B45"><svg viewBox="0 0 24 24"><path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg></span>
+          <div><b>跟著地圖走</b><p>依序闖關，過一關才開下一關</p></div></li>
+        <li><span class="orb" style="--c:#C79A3B"><svg viewBox="0 0 24 24"><path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5z"/><path d="M12 6v14"/></svg></span>
+          <div><b>讀故事、解謎題</b><p>每關拿到一個「通關字」</p></div></li>
+        <li><span class="orb" style="--c:#6E8EA6"><svg viewBox="0 0 24 24"><path d="M12 2l1.8 3.7 4 .6-2.9 2.8.7 4L12 11.2 8.4 13.1l.7-4-2.9-2.8 4-.6z"/><path d="M12 13v8M8 21h8"/></svg></span>
+          <div><b>收集五片故事</b><p>拼回完整的聖誕故事書</p></div></li>
+        <li><span class="orb" style="--c:#9E2B22"><svg viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="1.5"/><path d="M2 9h20v-3H2zM12 6v15"/><path d="M12 6c-1.5-3-5-3.5-5-1.5S10 6 12 6c2 0 5.5-.5 5-1.5S13.5 3 12 6z"/></svg></span>
+          <div><b>到櫃台領禮物</b><p>出示完賽證書，兌換聖誕小禮物</p></div></li>
       </ol>
     </div>
-    <form class="page" id="teamForm" style="display:grid;gap:12px" novalidate>
-      <h3 style="font-size:20px">探險家登入</h3>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <label class="field" for="clsInput">班級
+    <form class="tag" id="teamForm" novalidate>
+      <svg class="bow" viewBox="0 0 120 60" aria-hidden="true">
+        <path d="M60 30 C40 0 6 6 14 26 C20 40 44 36 60 30Z" fill="#C23A2E"/><path d="M60 30 C80 0 114 6 106 26 C100 40 76 36 60 30Z" fill="#C23A2E"/>
+        <path d="M60 30 C46 14 26 14 24 24" stroke="#9E2B22" stroke-width="3" fill="none"/><path d="M60 30 C74 14 94 14 96 24" stroke="#9E2B22" stroke-width="3" fill="none"/>
+        <path d="M56 32 L44 60 L52 56 L56 62Z M64 32 L76 60 L68 56 L64 62Z" fill="#9E2B22"/><circle cx="60" cy="30" r="8" fill="#9E2B22"/></svg>
+      <div class="tag-head">
+        <p class="tag-to">TO：聖誕老人</p>
+        <h3>探險家報到卡</h3>
+        <p class="note">填好就出發！資料只存在這支手機，會印在你的證書上。</p>
+      </div>
+      <div class="tag-fields">
+        <label class="field" for="clsInput"><span class="fi"><svg viewBox="0 0 24 24"><path d="M3 10l9-6 9 6v10H3z"/><path d="M9 20v-6h6v6"/></svg>班級</span>
           <input class="input" id="clsInput" maxlength="6" autocomplete="off" inputmode="numeric" placeholder="例如 205">
         </label>
-        <label class="field" for="seatInput">座號
+        <label class="field" for="seatInput"><span class="fi"><svg viewBox="0 0 24 24"><path d="M6 4h12v9H6zM4 13h16M7 13v7M17 13v7"/></svg>座號</span>
           <input class="input" id="seatInput" maxlength="2" autocomplete="off" inputmode="numeric" placeholder="例如 12">
         </label>
+        <label class="field full" for="nameInput"><span class="fi"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>姓名</span>
+          <input class="input" id="nameInput" maxlength="10" autocomplete="off" placeholder="例如 王小明">
+        </label>
       </div>
-      <label class="field" for="nameInput">姓名
-        <input class="input" id="nameInput" maxlength="10" autocomplete="off" placeholder="例如 王小明">
-      </label>
-      <p class="note">資料只存在這支手機上，會印在你的探險家證書。</p>
       <p class="err" id="teamErr"></p>
-      <button class="btn" type="submit">出發！計時開始</button>
+      <button class="btn candy" type="submit">出發！計時開始</button>
+      <svg class="peek" viewBox="0 0 70 60" aria-hidden="true"><circle cx="35" cy="44" r="24" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="2"/><rect x="21" y="8" width="28" height="18" rx="2" fill="#3B2F2A"/><rect x="15" y="22" width="40" height="5" rx="2" fill="#3B2F2A"/><rect x="21" y="18" width="28" height="4" fill="#C23A2E"/><circle cx="28" cy="40" r="2.6" fill="#3B2F2A"/><circle cx="42" cy="40" r="2.6" fill="#3B2F2A"/><path d="M35 45 L48 48 L35 49Z" fill="#E58A3A"/><circle cx="24" cy="47" r="3" fill="#F2A08F" opacity=".6"/><circle cx="46" cy="47" r="3" fill="#F2A08F" opacity=".6"/></svg>
     </form>
   </section>
 
@@ -825,7 +905,7 @@ function renderMap() {
   const tree = (x, y, s = 1) => `<g transform="translate(${x} ${y}) scale(${s})"><path d="M0 -26 L14 0 H-14Z M0 -16 L17 10 H-17Z" fill="#2E5B45" opacity=".85"/><rect x="-3" y="10" width="6" height="7" fill="#8A4A2B"/></g>`;
   let h = `
     <g fill="#FFFDF8">${Array.from({ length: 26 }, (_, i) => `<circle cx="${(i * 97) % 350 + 5}" cy="${(i * 211) % 540 + 10}" r="${1.5 + (i % 3)}" opacity=".9"/>`).join("")}</g>
-    ${tree(30, 380, .9)}${tree(330, 300, 1)}${tree(30, 200, .8)}${tree(330, 120, .9)}${tree(36, 70, .7)}${tree(300, 40, .7)}
+    ${tree(30, 380, .9)}${tree(330, 300, 1)}${tree(30, 200, .8)}${tree(334, 176, .8)}${tree(36, 70, .7)}${tree(300, 40, .7)}
     <g transform="translate(286 488)"><rect x="0" y="14" width="44" height="30" rx="3" fill="#B5733E"/><path d="M-4 16 L22 -6 L48 16Z" fill="#8A4A2B" stroke="#FFF8EF" stroke-width="3" stroke-linejoin="round"/><rect x="16" y="28" width="12" height="16" rx="6" fill="#C23A2E"/><rect x="5" y="20" width="8" height="8" fill="#FFD36B"/><rect x="31" y="20" width="8" height="8" fill="#FFD36B"/><circle cx="22" cy="5" r="2.5" fill="#FF5A4E"/></g>
     <g transform="translate(150 500)"><circle cx="0" cy="16" r="12" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="1.5"/><circle cx="0" cy="-2" r="8.5" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="1.5"/><rect x="-6" y="-16" width="12" height="9" fill="#3B2F2A"/><rect x="-9" y="-8" width="18" height="2.5" fill="#3B2F2A"/><path d="M-6 5 Q0 9 6 5" stroke="#C23A2E" stroke-width="3" fill="none"/><path d="M0 -1 L7 1 L0 2Z" fill="#E58A3A"/></g>
     <path d="${path}" fill="none" stroke="#E7DCCB" stroke-width="16" stroke-linecap="round"/>
@@ -843,14 +923,13 @@ function renderMap() {
     const label = done ? s.char : String(s.id);
     const tx = side === "r" ? x + 40 : side === "l" ? x - 40 : x;
     const anchor = side === "r" ? "start" : side === "l" ? "end" : "middle";
-    const ty = side === "t" ? y - 50 : y - 4;
+    const ty = side === "t" ? y - 44 : y + 6;
     h += `<g class="node ${ready ? "ready" : ""}" data-id="${s.id}" tabindex="0" role="button" aria-label="第${NUM[s.id]}關 ${esc(s.title)}，${done ? "已完成" : locked5 ? "尚未開放" : "前往"}">
       <circle class="ring" cx="${x}" cy="${y}" r="34" fill="none" stroke="${ready ? "#C23A2E" : "transparent"}" stroke-width="3"/>
       <circle cx="${x}" cy="${y}" r="27" fill="${fill}" stroke="${done || ready ? "none" : "#D9CBB5"}" stroke-width="2.5" stroke-dasharray="${done || ready ? "0" : "5 4"}"/>
       <text x="${x}" y="${y + 8}" text-anchor="middle" font-size="${done ? 24 : 20}" font-weight="700" fill="${fg}" font-family="LXGW WenKai TC, serif">${esc(label)}</text>
       ${locked5 ? `<g transform="translate(${x + 16} ${y + 12})"><circle r="10" fill="#3B2F2A"/><rect x="-5" y="-2" width="10" height="8" rx="2" fill="#FFF8EF"/><path d="M-3 -2v-3a3 3 0 0 1 6 0v3" stroke="#FFF8EF" stroke-width="1.8" fill="none"/></g>` : ""}
-      <text x="${tx}" y="${ty}" text-anchor="${anchor}" font-size="15" font-weight="700" fill="#3B2F2A" font-family="LXGW WenKai TC, serif">${esc(s.short)}</text>
-      <text x="${tx}" y="${ty + 18}" text-anchor="${anchor}" font-size="11.5" fill="#7A6A60" font-family="Noto Sans TC, sans-serif">${esc(s.place)}</text>
+      <text x="${tx}" y="${ty}" text-anchor="${anchor}" font-size="16" font-weight="700" fill="#3B2F2A" font-family="LXGW WenKai TC, serif">${esc(s.short)}</text>
     </g>`;
   });
   h += SANTA_SVG;
@@ -865,7 +944,7 @@ function renderMap() {
   const tip = $("#mapTip");
   if (S.finishedAt) tip.textContent = "五片故事都找回來了！點右上角的書本可以重讀完整故事。";
   else if (current === 5) tip.textContent = "四個通關字到齊！聖誕老人在第五關等你，DeDe 也在那裡！";
-  else tip.textContent = `點地圖上閃紅光的第${NUM[current]}關開始挑戰（建議地點：${stage(current).place}）。`;
+  else tip.textContent = `點地圖上閃紅光的第${NUM[current]}關開始挑戰！`;
 }
 
 /* 聖誕老人：站在目前關卡上方，過關後沿著小路走到下一關 */
@@ -1312,7 +1391,12 @@ function renderCert() {
       <circle cx="60" cy="60" r="50" fill="#C79A3B"/>
       <circle cx="60" cy="60" r="50" fill="none" stroke="#FFF8EF" stroke-width="3" stroke-dasharray="4 5"/>
       <circle cx="60" cy="60" r="38" fill="#FFF8EF"/>
-      <use href="#dedehead" x="26" y="24" width="68" height="68"/>
+      <g font-family="LXGW WenKai TC, Kaiti TC, serif" font-weight="700" font-size="25" text-anchor="middle">
+        <text x="37" y="71" fill="#C23A2E">S</text><text x="52.5" y="71" fill="#2E5B45">W</text><text x="68" y="71" fill="#C23A2E">S</text><text x="83" y="71" fill="#2E5B45">H</text></g>
+      <path d="M29 52 q4 -4 8 -1 q4 -3 8 0 q4 -3 8 0 q4 -3 8 0 q4 -3 8 0 q4 -3 8 0 q4 -3 8 0 q3 4 -3 5 H32 q-6 -1 -3 -4z" fill="#FFFFFF" stroke="#CFE0EA" stroke-width="1"/>
+      <path d="M53 36 C47 32 42 34 40 40 C45 38 48 40 49 43Z M67 36 C73 32 78 34 80 40 C75 38 72 40 71 43Z" fill="#2E5B45"/>
+      <circle cx="56" cy="40" r="3.4" fill="#C23A2E"/><circle cx="64" cy="40" r="3.4" fill="#C23A2E"/><circle cx="60" cy="36" r="3.4" fill="#9E2B22"/>
+      <text x="60" y="84" text-anchor="middle" font-family="Noto Sans TC, sans-serif" font-size="6.5" font-weight="700" letter-spacing="1" fill="#C79A3B">XMAS 2026</text>
     </svg>
     <p class="lbl">ADVENTURE CERTIFICATE</p>
     <h2>聖誕閱讀探險家</h2>
@@ -1327,7 +1411,7 @@ function renderCert() {
     </div>
     <p class="note">完賽驗證碼</p>
     <div class="code">${esc(S.code)}</div>
-    <p style="font-size:15px">請回到 <b>${esc(stage(5).place)}</b>，把這個畫面給工作人員看，兌換聖誕小禮物。</p>
+    <p style="font-size:15px">請回到 <b>${esc(C.redeemPlace || "櫃台")}</b>，把這個畫面給工作人員看，兌換聖誕小禮物。</p>
     <button class="btn small ghost" id="btnCertPng">下載證書圖片</button>
     ${S.redeemedAt ? `<div class="stamp">已兌換<small>${fmtDate(S.redeemedAt)}</small></div>` : ""}`;
   $("#btnCertPng").onclick = () => downloadCert(total);
@@ -1360,11 +1444,15 @@ async function downloadCert(total) {
   x.beginPath(); x.moveTo(660, 330); x.lineTo(700, 470); x.lineTo(640, 430); x.lineTo(610, 480); x.lineTo(600, 360); x.fill();
   x.fillStyle = "#C79A3B"; x.beginPath(); x.arc(600, 260, 120, 0, 7); x.fill();
   x.fillStyle = "#FFF8EF"; x.beginPath(); x.arc(600, 260, 92, 0, 7); x.fill();
-  const svg = document.querySelector("#dedehead").cloneNode(true);
-  const img = new Image();
-  const src = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80">' + svg.innerHTML + "</svg>";
-  await new Promise((r) => { img.onload = r; img.onerror = r; img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(src); });
-  try { x.drawImage(img, 520, 175, 160, 160); } catch (e) {}
+  // 聖誕風格 SWSH 字樣：冬青葉、雪帽、紅綠交錯字母
+  x.fillStyle = "#2E5B45";
+  [[-1, 1], [1, -1]].forEach(([d]) => { x.beginPath(); x.moveTo(600 + d * 14, 200); x.quadraticCurveTo(600 + d * 50, 170, 600 + d * 62, 196); x.quadraticCurveTo(600 + d * 40, 194, 600 + d * 34, 212); x.closePath(); x.fill(); });
+  [[588, 205, "#C23A2E"], [612, 205, "#C23A2E"], [600, 193, "#9E2B22"]].forEach(([cx, cy, col]) => { x.fillStyle = col; x.beginPath(); x.arc(cx, cy, 10, 0, 7); x.fill(); });
+  x.textAlign = "center"; x.font = "700 78px " + story;
+  "SWSH".split("").forEach((ch, i) => { x.fillStyle = i % 2 ? "#2E5B45" : "#C23A2E"; x.fillText(ch, 600 + (i - 1.5) * 48, 298); });
+  x.fillStyle = "#FFFFFF"; x.strokeStyle = "#CFE0EA"; x.lineWidth = 3;
+  x.beginPath(); x.moveTo(512, 230); for (let i = 0; i < 7; i++) x.quadraticCurveTo(518 + i * 25, 216, 530 + i * 25, 228); x.quadraticCurveTo(696, 244, 680, 242); x.lineTo(516, 242); x.closePath(); x.fill(); x.stroke();
+  x.fillStyle = "#C79A3B"; x.font = "700 20px " + ui; x.fillText("XMAS 2026", 600, 326);
   x.textAlign = "center";
   x.fillStyle = "#C79A3B"; x.font = "700 28px " + ui; x.fillText("A D V E N T U R E   C E R T I F I C A T E", 600, 560);
   x.fillStyle = "#3B2F2A"; x.font = "700 76px " + story; x.fillText("聖誕閱讀探險家", 600, 660);

@@ -4,8 +4,9 @@
  * index.html（學生遊戲）與 staff.html（工作人員後台）共用這份設定。
  */
 window.QUEST_CONFIG = {
-  eventName: "四維高中圖書館聖誕週",
-  questName: "聖誕故事失竊事件：DeDe 的最後任務",
+  eventName: "SWSH四維高中圖書館聖誕活動",
+  questName: "叮叮噹！聖誕閱讀闖關：2026的最後任務",
+  redeemPlace: "櫃台",
   englishName: "SWSH Christmas Reading Quest",
   slogan: "今年聖誕節，故事不會自己找到你，你必須親自把它找回來！",
   targetMinutes: 10,
