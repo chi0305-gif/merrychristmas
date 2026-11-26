@@ -1938,7 +1938,7 @@ function renderDemoFlag() { if (S.demo && !$(".demo-flag")) { const d = document
 addEventListener("hashchange", handleHash);
 
 renderDemoFlag();
-if (!handleHash()) show(S.team ? (S.finishedAt ? "cert" : "map") : "home");
+if (!handleHash()) show("home");
 })();
 </script>
 </body>
