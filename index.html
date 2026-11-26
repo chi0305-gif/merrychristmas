@@ -128,6 +128,36 @@ p { margin: 0; }
 .btn[disabled] { opacity: .45; pointer-events: none; }
 .btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 
+/* 音樂按鈕 */
+.musicbtn { position: fixed; z-index: 45; right: max(12px, env(safe-area-inset-right, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  display: grid; place-items: center; gap: 0; width: 58px; height: 58px; border-radius: 50%; border: 0; color: #FFF8EF;
+  background: radial-gradient(circle at 35% 30%, #E25A4C, var(--red) 60%, var(--red-deep)); box-shadow: 0 0 0 3px #FFF8EF, 0 0 0 5px var(--gold), 0 10px 20px rgba(0,0,0,.35); }
+.musicbtn svg { width: 22px; height: 22px; margin-top: 4px; }
+.musicbtn span { font-size: 10px; font-weight: 700; letter-spacing: .05em; line-height: 1; margin-bottom: 6px; }
+.musicbtn.inbar { position: relative; right: auto; bottom: auto; width: 40px; height: 40px; flex: none; box-shadow: 0 0 0 2px var(--gold); }
+.musicbtn.inbar svg { margin: 0; width: 20px; height: 20px; }
+.musicbtn.inbar span { display: none; }
+.musicbtn.inbar.on::after { inset: -5px; }
+.musicbtn:not(.inbar) { width: 50px; height: 50px; bottom: auto; top: calc(env(safe-area-inset-top, 0px) + 10px); }
+.musicbtn.on svg { animation: beat .6s ease-in-out infinite alternate; }
+.musicbtn.on::after { content: ""; position: absolute; inset: -9px; border-radius: 50%; border: 2px dashed var(--gold); animation: spin 8s linear infinite; }
+@keyframes beat { to { transform: scale(1.18) rotate(-8deg); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+/* 背景星星 */
+.sky-stars { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.sky-stars svg { position: absolute; width: var(--s, 14px); height: var(--s, 14px); color: #FFD36B; animation: twinkle var(--d, 1.8s) ease-in-out infinite alternate; filter: drop-shadow(0 0 4px rgba(255,211,107,.8)); }
+/* 卡片角落裝飾 */
+.deco { position: absolute; pointer-events: none; z-index: 3; }
+.deco.cane { top: -26px; right: 10px; width: 34px; transform: rotate(14deg); }
+.deco.gift { bottom: -18px; right: 22px; width: 38px; animation: hop 3.4s ease-in-out infinite; }
+.deco.mitt { bottom: -22px; left: 14px; width: 50px; transform-origin: 50% 0; animation: swing 2.8s ease-in-out infinite alternate; }
+/* 雪景互動 */
+.scene .poke { cursor: pointer; pointer-events: all; }
+.scene .boing { animation: boing .6s cubic-bezier(.3,1.6,.5,1); transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes boing { 0% { transform: scale(1); } 30% { transform: scale(1.25, .8); } 60% { transform: scale(.9, 1.15); } 100% { transform: scale(1); } }
+.scene .dangle { transform-box: fill-box; transform-origin: 50% 0; animation: swing 2.2s ease-in-out infinite alternate; }
+.scene .dangle.b { animation-delay: -1.1s; }
+.scene-tip { text-align: center; font-size: 12px; color: #CFE0D6; margin-top: 4px; letter-spacing: .08em; }
 /* ---------- top bar ---------- */
 .topbar {
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
@@ -149,7 +179,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .frag-dots span { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-story); font-size: 12px; font-weight: 700; background: rgba(255,255,255,.08); color: transparent; box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.25); }
 .frag-dots span.on { background: #3E8A62; color: #FFF8EF; box-shadow: none; }
 .frag-dots span.on.final { background: var(--gold); }
-@media (max-width: 380px) { .frag-dots { display: none; } }
+@media (max-width: 440px) { .frag-dots { display: none; } }
 
 /* ---------- home ---------- */
 .cover { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; padding-top: 6px; }
@@ -258,6 +288,8 @@ label.field { display: grid; gap: 6px; font-weight: 700; font-size: 15px; }
 .santa .ho { opacity: 0; transition: opacity .3s; }
 .santa.say .ho { opacity: 1; }
 @keyframes step { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+.mapbox .blink { animation: twinkle 1.2s ease-in-out infinite alternate; }
+.mapbox .blink:nth-of-type(2n) { animation-delay: -.6s; }
 .map-tip { font-size: 14px; color: var(--ink-soft); text-align: center; }
 
 /* ---------- stage ---------- */
@@ -526,6 +558,31 @@ details.cb[open] summary { margin-bottom: 8px; }
       <rect x="15" y="23" width="50" height="10" rx="5" fill="#FFF8EF"/>
       <circle cx="68" cy="13" r="6" fill="#FFF8EF"/>
     </symbol>
+    <symbol id="snowhead" viewBox="0 0 80 80">
+      <circle cx="40" cy="46" r="24" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="2.5"/>
+      <rect x="24" y="4" width="32" height="24" rx="3" fill="#3B2F2A"/><rect x="16" y="24" width="48" height="6" rx="3" fill="#3B2F2A"/><rect x="24" y="19" width="32" height="5" fill="#C23A2E"/>
+      <circle cx="32" cy="43" r="3" fill="#3B2F2A"/><circle cx="48" cy="43" r="3" fill="#3B2F2A"/><path d="M40 48 L57 52 L40 54Z" fill="#E58A3A"/>
+      <circle cx="28" cy="53" r="3.5" fill="#F2A08F" opacity=".6"/><circle cx="52" cy="53" r="3.5" fill="#F2A08F" opacity=".6"/>
+      <path d="M33 59 Q40 63 47 59" stroke="#3B2F2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M17 66 Q40 77 63 66 L63 74 Q40 84 17 74Z" fill="#C23A2E"/>
+    </symbol>
+    <symbol id="gbman" viewBox="0 0 80 80"><g transform="translate(17 8) scale(1.3)">
+      <circle cx="18" cy="10" r="10" fill="#B5733E"/>
+      <path d="M8 20 H28 Q40 20 40 26 Q40 31 30 31 H28 L33 46 Q35 52 29 52 H26 L18 40 L10 52 H7 Q1 52 3 46 L8 31 H6 Q-4 31 -4 26 Q-4 20 8 20Z" fill="#B5733E"/>
+      <circle cx="14" cy="8" r="1.6" fill="#3B2F2A"/><circle cx="22" cy="8" r="1.6" fill="#3B2F2A"/><path d="M14 13 Q18 16 22 13" stroke="#FFF8EF" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <circle cx="11" cy="11" r="1.8" fill="#F2A08F"/><circle cx="25" cy="11" r="1.8" fill="#F2A08F"/>
+      <circle cx="18" cy="26" r="2" fill="#FF5A4E"/><circle cx="18" cy="34" r="2" fill="#5FD38D"/>
+      <path d="M-1 24 q2 2 0 4 M37 24 q2 2 0 4 M6 46 q3 1 6 0 M24 46 q3 1 6 0" stroke="#FFF8EF" stroke-width="1.6" fill="none"/>
+    </g></symbol>
+    <symbol id="deerhead" viewBox="0 0 80 80">
+      <path d="M28 28 Q14 14 18 2 M21 15 L10 13 M52 28 Q66 14 62 2 M59 15 L70 13" stroke="#6B3820" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <ellipse cx="19" cy="36" rx="10" ry="5" fill="#8A4A2B" transform="rotate(-25 19 36)"/><ellipse cx="61" cy="36" rx="10" ry="5" fill="#8A4A2B" transform="rotate(25 61 36)"/>
+      <circle cx="40" cy="44" r="21" fill="#9C5733"/><ellipse cx="40" cy="60" rx="13" ry="9" fill="#C08257"/>
+      <circle cx="31" cy="41" r="2.2" fill="#2A1B14"/><circle cx="49" cy="41" r="2.2" fill="#2A1B14"/>
+      <circle cx="31" cy="41" r="6.5" fill="none" stroke="#3B2F2A" stroke-width="2"/><circle cx="49" cy="41" r="6.5" fill="none" stroke="#3B2F2A" stroke-width="2"/><path d="M37.5 41 h5" stroke="#3B2F2A" stroke-width="2"/>
+      <circle cx="40" cy="56" r="5.5" fill="#FF4D40"/><circle cx="38.5" cy="54.5" r="1.6" fill="#fff" opacity=".7"/>
+      <path d="M35 64 Q40 67 45 64" stroke="#5E301B" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+    </symbol>
     <symbol id="star" viewBox="0 0 24 24"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></symbol>
     <symbol id="flake" viewBox="0 0 24 24"><g stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"><path d="M12 2v20M3.3 7l17.4 10M3.3 17L20.7 7"/><path d="M9 4l3 2 3-2M9 20l3-2 3 2M3 10.5l3.5-.3L5 7M21 13.5l-3.5.3L19 17M3 13.5l3.5.3L5 17M21 10.5l-3.5-.3L19 7"/></g></symbol>
     <symbol id="pin" viewBox="0 0 24 24"><path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z" fill="currentColor"/><circle cx="12" cy="10" r="2.6" fill="#FFFDF8"/></symbol>
@@ -545,10 +602,11 @@ details.cb[open] summary { margin-bottom: 8px; }
     <rect x="70" y="22" width="16" height="16" rx="3" fill="#2E5B45"/><rect x="76" y="22" width="4" height="16" fill="#C79A3B"/>
     <path d="M4 66 H92 Q100 66 100 58" stroke="#C79A3B" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M20 58 V66 M76 58 V66" stroke="#C79A3B" stroke-width="3"/>
   </g></g></svg>
+<div class="sky-stars" aria-hidden="true"><svg style="left:4%;top:6%;--s:14px;--d:1.6s;animation-delay:-0.2s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg><svg style="left:93%;top:4%;--s:18px;--d:2.1s;animation-delay:-0.9s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg><svg style="left:12%;top:22%;--s:10px;--d:1.3s;animation-delay:-0.5s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg><svg style="left:96%;top:26%;--s:12px;--d:1.8s;animation-delay:-1.1s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg><svg style="left:3%;top:46%;--s:16px;--d:2.2s;animation-delay:-0.3s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg><svg style="left:97%;top:52%;--s:10px;--d:1.5s;animation-delay:-0.7s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg><svg style="left:6%;top:72%;--s:12px;--d:1.9s;animation-delay:-1.4s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg><svg style="left:94%;top:78%;--s:16px;--d:2.3s;animation-delay:-0.4s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg><svg style="left:50%;top:2%;--s:12px;--d:1.7s;animation-delay:-0.8s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg><svg style="left:28%;top:1%;--s:9px;--d:1.4s;animation-delay:-0.1s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg><svg style="left:72%;top:3%;--s:11px;--d:2s;animation-delay:-0.6s" viewBox="0 0 24 24"><use href="#star" fill="currentColor"/></svg></div>
 <div class="wrap" id="app">
 
   <div class="topbar" id="topbar" hidden>
-    <div class="team"><small>聖誕探險家</small><span id="teamName"></span></div>
+    <div class="team"><small>聖誕故事收藏家</small><span id="teamName"></span></div>
     <div class="frag-dots" id="fragDots" aria-label="故事碎片"></div>
     <div class="timer" id="timer" title="遊戲時間">00:00</div>
     <button class="iconbtn" id="btnMap" aria-label="冒險地圖">
@@ -558,9 +616,6 @@ details.cb[open] summary { margin-bottom: 8px; }
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-1.5-5-2-8-1.5v14c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-14c-3-.5-6 0-8 1.5z"/><path d="M12 6v14"/></svg>
     </button>
     <div class="lights" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <button class="iconbtn" id="btnSound" aria-label="音效開關">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5L6 9H3v6h3l5 4z"/><path id="soundWave" d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>
-    </button>
   </div>
 
   <!-- 01 首頁 -->
@@ -647,7 +702,7 @@ details.cb[open] summary { margin-bottom: 8px; }
         <path d="M56 32 L44 60 L52 56 L56 62Z M64 32 L76 60 L68 56 L64 62Z" fill="#9E2B22"/><circle cx="60" cy="30" r="8" fill="#9E2B22"/></svg>
       <div class="tag-head">
         <p class="tag-to">TO：聖誕老人</p>
-        <h3>探險家報到卡</h3>
+        <h3>玩家準備出發！</h3>
         <p class="note">填好就出發！資料只存在這支手機，會印在你的證書上。</p>
       </div>
       <div class="tag-fields">
@@ -682,7 +737,7 @@ details.cb[open] summary { margin-bottom: 8px; }
     <div class="stage-head" id="stageHead"></div>
     <div class="play" id="stagePlay"></div>
     <div class="tip" id="tip" hidden>
-      <svg viewBox="0 0 80 80" aria-hidden="true"><use href="#dedehead"/></svg>
+      <svg viewBox="0 0 80 80" aria-hidden="true"><use id="tipAvatar" href="#dedehead"/></svg>
       <div class="bubble" id="tipText" role="status" aria-live="polite"></div>
     </div>
   </section>
@@ -702,7 +757,7 @@ details.cb[open] summary { margin-bottom: 8px; }
   <section class="screen" data-screen="story" hidden>
     <div><div class="eyebrow">THE CHRISTMAS STORY BOOK</div><h2 style="font-size:24px">完整的聖誕故事回來了</h2></div>
     <div class="page deckle" id="fullStory"></div>
-    <div class="btn-row"><button class="btn" id="btnToCert">領取探險家證書</button></div>
+    <div class="btn-row"><button class="btn" id="btnToCert">領取收藏家證書</button></div>
   </section>
 
   <!-- 06 完賽證書 -->
@@ -711,10 +766,21 @@ details.cb[open] summary { margin-bottom: 8px; }
     <div class="staff" id="staffBox"></div>
     <div class="btn-row"><button class="btn green" data-reset>重新開始遊戲（換下一位玩）</button></div>
   </section>
-  <div class="scene" aria-hidden="true"><svg viewBox="0 0 400 170">
+  <div class="scene"><svg viewBox="0 -70 400 240" role="img" aria-label="聖誕雪景：薑餅屋、聖誕樹、雪人、薑餅人和麋鹿">
+    <g fill="#FFD36B">
+      <use class="blink" href="#star" x="20" y="-62" width="14" height="14"/><use class="blink" href="#star" x="366" y="-66" width="16" height="16"/>
+      <use class="blink" href="#star" x="128" y="-14" width="11" height="11"/><use class="blink" href="#star" x="262" y="-4" width="12" height="12"/><use class="blink" href="#star" x="196" y="-66" width="10" height="10"/>
+    </g>
+    <path d="M0 -50 Q200 -10 400 -50" stroke="#C79A3B" stroke-width="1.5" fill="none"/>
+    <g transform="translate(40 -42)"><g class="dangle poke" data-snd="boop"><path d="M0 0 V6" stroke="#C79A3B"/><g transform="translate(-14 4)"><rect x="2" y="10" width="13" height="20" rx="6.5" fill="#C23A2E"/><ellipse cx="2" cy="18" rx="3.4" ry="5" fill="#C23A2E" transform="rotate(-25 2 18)"/><rect x="1" y="6" width="15" height="6" rx="2" fill="#FFF8EF"/><circle cx="8" cy="20" r="1.4" fill="#FFF8EF"/></g><g transform="translate(2 4)"><rect x="2" y="10" width="13" height="20" rx="6.5" fill="#C23A2E"/><ellipse cx="15" cy="18" rx="3.4" ry="5" fill="#C23A2E" transform="rotate(25 15 18)"/><rect x="1" y="6" width="15" height="6" rx="2" fill="#FFF8EF"/><circle cx="9" cy="20" r="1.4" fill="#FFF8EF"/></g></g></g>
+    <g transform="translate(102 -36)"><g class="dangle b poke" data-snd="boop"><path d="M0 0 V6" stroke="#C79A3B"/><path d="M-6 10 h12 v16 l9 6 q4 5 -2 9 l-12 -5 q-7 -3 -7 -10z" fill="#C23A2E"/><rect x="-8" y="6" width="16" height="7" rx="2" fill="#FFF8EF"/><path d="M-3 18 l3 3 3 -3" stroke="#FFF8EF" stroke-width="1.4" fill="none"/></g></g>
+    <g transform="translate(164 -31)"><g class="dangle poke" data-snd="bell"><path d="M0 0 V5" stroke="#C79A3B"/><path d="M-10 26 q0 -18 10 -18 q10 0 10 18z" fill="#E0B451"/><circle cx="0" cy="27" r="3" fill="#9A7425"/><path d="M-6 8 q6 -6 12 0" stroke="#C23A2E" stroke-width="3" fill="none"/><path d="M-6 14 q2 -3 4 -4" stroke="#FFF8EF" stroke-width="1.5" fill="none" opacity=".7"/></g></g>
+    <g transform="translate(236 -31)"><g class="dangle b poke" data-snd="boop"><path d="M0 0 V4" stroke="#C79A3B"/><path d="M-4 40 V14 a7 7 0 0 1 14 0 v3" stroke="#FFF8EF" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M-4 40 V14 a7 7 0 0 1 14 0 v3" stroke="#C23A2E" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="4 4"/></g></g>
+    <g transform="translate(298 -36)"><g class="dangle poke" data-snd="bell"><path d="M0 0 V4" stroke="#C79A3B"/><use href="#star" x="-12" y="3" width="24" height="24" fill="#FFD36B"/></g></g>
+    <g transform="translate(358 -42)"><g class="dangle b poke" data-snd="boop"><path d="M0 0 V6" stroke="#C79A3B"/><rect x="-10" y="10" width="20" height="16" rx="2" fill="#6E8EA6"/><rect x="-12" y="7" width="24" height="5" rx="1.5" fill="#7FA0B8"/><rect x="-2" y="7" width="4" height="19" fill="#FFF8EF"/><path d="M0 7 C-6 0 -10 4 -6 7Z M0 7 C6 0 10 4 6 7Z" fill="#FFF8EF"/></g></g>
     <path d="M0 120 Q70 92 140 112 T270 104 T400 112 V170 H0Z" fill="#DCE8EE"/>
     <!-- 薑餅屋 -->
-    <g transform="translate(8 36)">
+    <g transform="translate(8 36)"><g class="poke" data-snd="bell">
       <rect x="60" y="4" width="12" height="26" fill="#7A4126"/>
       <g class="smoke"><circle cx="66" cy="-2" r="5" fill="#fff"/><circle cx="66" cy="-2" r="5" fill="#fff"/><circle cx="66" cy="-2" r="5" fill="#fff"/></g>
       <rect x="10" y="40" width="84" height="56" rx="4" fill="#B5733E"/>
@@ -726,17 +792,19 @@ details.cb[open] summary { margin-bottom: 8px; }
       <path d="M18 60 H36 M27 52 V68 M68 60 H86 M77 52 V68" stroke="#FFF8EF" stroke-width="2"/>
       <path d="M42 96 V74 a10 10 0 0 1 20 0 V96Z" fill="#C23A2E"/><circle cx="57" cy="84" r="1.8" fill="#FFD36B"/>
       <path d="M100 96 V72 q0 -8 -7 -8" stroke="#FFF8EF" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M100 96 V72 q0 -8 -7 -8" stroke="#C23A2E" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="3 4"/>
-    </g>
+    </g></g>
     <!-- 聖誕樹 -->
-    <g transform="translate(150 28)"><g class="sway">
+    <g transform="translate(150 28)"><g class="poke" data-snd="bell"><g class="sway">
       <path d="M24 8 L46 46 H2Z M24 28 L52 76 H-4Z M24 52 L56 104 H-8Z" fill="#2E5B45"/>
       <rect x="19" y="104" width="10" height="12" fill="#7A4126"/>
       <path class="blink" d="M24 -6 l3.5 8 8.5 .8 -6.4 5.6 1.9 8.3 -7.5 -4.4 -7.5 4.4 1.9 -8.3 -6.4 -5.6 8.5 -.8z" fill="#FFD36B"/>
       <circle class="blink" cx="16" cy="40" r="3" fill="#FF5A4E"/><circle class="blink" cx="32" cy="60" r="3" fill="#FFD36B"/><circle class="blink" cx="10" cy="70" r="3" fill="#7CC4FF"/>
       <circle class="blink" cx="38" cy="88" r="3" fill="#FF5A4E"/><circle class="blink" cx="6" cy="94" r="3" fill="#FFD36B"/><circle class="blink" cx="26" cy="30" r="3" fill="#7CC4FF"/>
-    </g></g>
+    </g></g></g>
+    <g transform="translate(176 120)"><rect x="0" y="6" width="18" height="14" rx="2" fill="#C23A2E"/><rect x="7" y="6" width="4" height="14" fill="#FFD36B"/><path d="M9 6 C5 0 1 3 4 6Z M9 6 C13 0 17 3 14 6Z" fill="#FFD36B"/>
+      <rect x="20" y="10" width="14" height="10" rx="2" fill="#6E8EA6"/><rect x="25" y="10" width="3" height="10" fill="#FFF8EF"/></g>
     <!-- 雪人 -->
-    <g transform="translate(214 50)">
+    <g transform="translate(214 50)"><g class="poke" data-snd="boop">
       <circle cx="24" cy="72" r="24" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="2"/><circle cx="24" cy="34" r="17" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="2"/>
       <rect x="10" y="10" width="28" height="5" rx="2" fill="#3B2F2A"/><rect x="14" y="-8" width="20" height="20" rx="2" fill="#3B2F2A"/><rect x="14" y="4" width="20" height="4" fill="#C23A2E"/>
       <circle cx="18" cy="31" r="2.2" fill="#3B2F2A"/><circle cx="30" cy="31" r="2.2" fill="#3B2F2A"/><path d="M24 36 L36 39 L24 40Z" fill="#E58A3A"/>
@@ -744,17 +812,17 @@ details.cb[open] summary { margin-bottom: 8px; }
       <circle cx="24" cy="66" r="2.5" fill="#3B2F2A"/><circle cx="24" cy="76" r="2.5" fill="#3B2F2A"/>
       <path d="M2 60 L-14 46" stroke="#7A4126" stroke-width="3" stroke-linecap="round"/>
       <g class="wave"><path d="M46 60 L62 42 M58 46 L64 46 M58 46 L58 40" stroke="#7A4126" stroke-width="3" stroke-linecap="round" fill="none"/></g>
-    </g>
+    </g></g>
     <!-- 薑餅人 -->
-    <g transform="translate(284 84)"><g class="hop">
+    <g transform="translate(284 84)"><g class="poke" data-snd="boop"><g class="hop">
       <circle cx="18" cy="10" r="10" fill="#B5733E"/>
       <path d="M8 20 H28 Q40 20 40 26 Q40 31 30 31 H28 L33 46 Q35 52 29 52 H26 L18 40 L10 52 H7 Q1 52 3 46 L8 31 H6 Q-4 31 -4 26 Q-4 20 8 20Z" fill="#B5733E"/>
       <circle cx="14" cy="8" r="1.6" fill="#3B2F2A"/><circle cx="22" cy="8" r="1.6" fill="#3B2F2A"/><path d="M14 13 Q18 16 22 13" stroke="#FFF8EF" stroke-width="1.6" fill="none" stroke-linecap="round"/>
       <circle cx="18" cy="26" r="2" fill="#FF5A4E"/><circle cx="18" cy="34" r="2" fill="#5FD38D"/>
       <path d="M-1 24 q2 2 0 4 M37 24 q2 2 0 4 M6 46 q3 1 6 0 M24 46 q3 1 6 0" stroke="#FFF8EF" stroke-width="1.6" fill="none"/>
-    </g></g>
+    </g></g></g>
     <!-- 麋鹿 -->
-    <g transform="translate(330 56)">
+    <g transform="translate(330 56)"><g class="poke" data-snd="bell">
       <ellipse cx="30" cy="54" rx="24" ry="13" fill="#9C5733"/>
       <rect x="12" y="60" width="5" height="24" rx="2" fill="#7A4126"/><rect x="22" y="62" width="5" height="22" rx="2" fill="#6B3820"/><rect x="36" y="62" width="5" height="22" rx="2" fill="#7A4126"/><rect x="45" y="60" width="5" height="24" rx="2" fill="#6B3820"/>
       <circle cx="7" cy="48" r="4" fill="#FFF8EF"/>
@@ -765,11 +833,14 @@ details.cb[open] summary { margin-bottom: 8px; }
         <path d="M50 14 Q44 2 48 -6 M46 4 L40 0 M58 12 Q60 0 66 -6 M61 2 L68 0" stroke="#6B3820" stroke-width="2.6" fill="none" stroke-linecap="round"/>
         <path d="M48 30 Q54 36 62 32" stroke="#C23A2E" stroke-width="4" fill="none"/><circle cx="55" cy="35" r="2.4" fill="#FFD36B"/>
       </g>
-    </g>
+    </g></g>
     <path d="M0 140 Q100 122 200 136 T400 132 V170 H0Z" fill="#FFFDF8"/>
-  </svg></div>
+    <g transform="translate(128 128)"><path d="M0 30 V8 a6 6 0 0 1 12 0" stroke="#FFF8EF" stroke-width="4.5" fill="none" stroke-linecap="round"/><path d="M0 30 V8 a6 6 0 0 1 12 0" stroke="#C23A2E" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-dasharray="3.5 3.5"/></g>
+    <g transform="translate(392 130) scale(-1 1)"><path d="M0 30 V8 a6 6 0 0 1 12 0" stroke="#FFF8EF" stroke-width="4.5" fill="none" stroke-linecap="round"/><path d="M0 30 V8 a6 6 0 0 1 12 0" stroke="#2E5B45" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-dasharray="3.5 3.5"/></g>
+  </svg><p class="scene-tip">點點看雪景裡的角色和吊飾！</p></div>
 </div>
 
+<button class="musicbtn" id="btnMusic" aria-label="聖誕音樂開關"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g id="icoMusic"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3" fill="currentColor"/><circle cx="17" cy="16" r="3" fill="currentColor"/></g><g id="icoSfx" hidden><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/></g><g id="icoMute" hidden><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M16 9l5 6M21 9l-5 6"/></g></svg><span id="musicLbl">音樂</span></button>
 <div id="overlayRoot"></div>
 
 <script src="config.js"></script>
@@ -816,6 +887,25 @@ const CONTENT = {
   }
 };
 
+/* 第三關書籍偵探題庫：每次重新開始會隨機抽一本 */
+const BOOKS3 = [
+  { t: "小王子", a: "聖修伯里", c: ["主角是一位來自外星球的小男孩。", "他曾經造訪許多不同的星球。", "故事裡有狐狸、玫瑰，還有一段關於「馴養」的對話。"], h: "注意「狐狸」和「玫瑰」，是哪本書呢？", n: "「真正重要的東西，用眼睛是看不見的。」" },
+  { t: "哈利波特", a: "J.K. 羅琳", c: ["主角從小住在樓梯下的儲物間。", "他在 11 歲生日時收到一封入學通知信。", "他的額頭有一道閃電形狀的疤痕。"], h: "閃電形狀的疤痕，是哪位巫師呢？", n: "一個平凡的男孩，發現自己其實是巫師。" },
+  { t: "夏洛的網", a: "E.B. 懷特", c: ["故事發生在一座農場。", "主角是一隻差點被宰掉的小豬。", "一隻蜘蛛在網上織出文字救了牠。"], h: "會在網上寫字的蜘蛛，是哪本書？", n: "一隻蜘蛛用文字，改變了好朋友的命運。" },
+  { t: "老人與海", a: "海明威", c: ["主角是一位很久沒捕到魚的老漁夫。", "他獨自出海，和一條大魚搏鬥了好幾天。", "最後他只帶回一副巨大的魚骨。"], h: "老漁夫和大海的故事，是哪本書？", n: "「人可以被毀滅，但不能被打敗。」" },
+  { t: "愛麗絲夢遊仙境", a: "路易斯．卡羅", c: ["主角追著一隻拿懷錶的白兔。", "她掉進一個很深很深的兔子洞。", "她遇到了瘋帽客和紅心皇后。"], h: "白兔、兔子洞、紅心皇后⋯⋯", n: "喝一口變小、吃一口變大，一場荒謬又好玩的奇幻冒險。" },
+  { t: "綠野仙蹤", a: "法蘭克．包姆", c: ["一陣龍捲風把女孩和她的狗吹到奇幻國度。", "她沿著一條黃磚路前進。", "同伴有稻草人、錫樵夫和膽小的獅子。"], h: "黃磚路和膽小的獅子，是哪本書？", n: "每個同伴都在找自己缺少的東西，最後發現其實早就擁有。" },
+  { t: "清秀佳人", a: "露西．蒙哥馬利", c: ["主角是一個被誤送到農莊的孤兒女孩。", "她有一頭紅髮，想像力超級豐富。", "她住在愛德華王子島的綠色屋頂之家。"], h: "紅髮女孩和綠色屋頂之家⋯⋯", n: "愛說話、愛幻想的安妮，讓整個小鎮都溫暖了起來。" }
+];
+function content(id) {
+  if (id !== 3) return CONTENT[id];
+  const b = BOOKS3[S.p3] || BOOKS3[0];
+  return Object.assign({}, CONTENT[3], {
+    frag: { title: CONTENT[3].frag.title, text: `麋鹿老師的書單上，最後一本是《${b.t}》。他把書抱在懷裡說：「每年聖誕節，我都要重讀一本喜歡的書，因為好故事會陪你度過每一個冬天。」` },
+    book: { title: b.t, author: b.a, note: b.n + "到書架區找找這本書吧。", color: "#C79A3B" }
+  });
+}
+
 /* ================= 狀態 ================= */
 const KEY = "swsh-xmas-quest-v1";
 const fresh = () => ({ team: "", startedAt: 0, unlocked: {}, done: {}, finishedAt: 0, code: "", redeemedAt: 0, demo: false, mute: false, badge4: false });
@@ -834,6 +924,8 @@ let pendingStage = 0;
 function show(name) {
   document.querySelectorAll(".screen").forEach((el) => { el.hidden = el.dataset.screen !== name; });
   $("#topbar").hidden = ["home", "prologue"].includes(name);
+  const mb = $("#btnMusic");
+  if ($("#topbar").hidden) { mb.classList.remove("inbar"); document.body.appendChild(mb); } else { mb.classList.add("inbar"); $("#topbar").appendChild(mb); }
   if (name === "map") renderMap();
   if (name === "book") renderBook();
   if (name === "story") renderStory();
@@ -844,9 +936,10 @@ function show(name) {
 }
 
 function updateBar() {
-  $("#teamName").textContent = S.name ? `${S.name}（${S.cls}-${S.seat}）` : S.team || "";
+  $("#teamName").textContent = S.name || S.team || "";
+  $(".team small").textContent = S.cls ? `${S.cls} 班 ${S.seat} 號` : "聖誕故事收藏家";
   $("#fragDots").innerHTML = C.stages.map((s) => `<span class="${isDone(s.id) ? "on" : ""} ${s.id === 5 ? "final" : ""}">${isDone(s.id) ? esc(s.char) : ""}</span>`).join("");
-  $("#soundWave").style.opacity = S.mute ? 0 : 1;
+  paintMusicBtn();
   tick();
 }
 function fmt(ms) { const t = Math.max(0, Math.floor(ms / 1000)); return String(Math.floor(t / 60)).padStart(2, "0") + ":" + String(t % 60).padStart(2, "0"); }
@@ -862,6 +955,18 @@ function toast(msg, ms = 2800) {
   const t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
   document.body.appendChild(t); setTimeout(() => t.remove(), ms);
 }
+
+/* 每張卡片的角落裝飾：拐杖糖、禮物、手套 */
+const DECO = {
+  cane: '<svg class="deco cane" viewBox="0 0 34 70" aria-hidden="true"><path d="M10 66 V18 a10 10 0 0 1 20 0 v4" stroke="#FFF8EF" stroke-width="8" fill="none" stroke-linecap="round"/><path d="M10 66 V18 a10 10 0 0 1 20 0 v4" stroke="#C23A2E" stroke-width="8" fill="none" stroke-linecap="round" stroke-dasharray="6 6"/><path d="M4 30 q6 -8 12 0" stroke="#2E5B45" stroke-width="5" fill="none" stroke-linecap="round"/><circle cx="10" cy="28" r="3" fill="#C23A2E"/></svg>',
+  gift: '<svg class="deco gift" viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="14" width="34" height="24" rx="3" fill="#2E5B45"/><rect x="1" y="10" width="38" height="8" rx="2" fill="#3A6E55"/><rect x="17" y="10" width="6" height="28" fill="#C79A3B"/><path d="M20 10 C12 0 4 6 10 10Z M20 10 C28 0 36 6 30 10Z" fill="#C23A2E"/></svg>',
+  mitt: '<svg class="deco mitt" viewBox="0 0 50 44" aria-hidden="true"><path d="M2 2 Q25 14 48 2" stroke="#7A4126" stroke-width="1.5" fill="none"/><g transform="translate(6 6)"><rect x="2" y="10" width="13" height="20" rx="6.5" fill="#C23A2E"/><ellipse cx="2" cy="18" rx="3.4" ry="5" fill="#C23A2E" transform="rotate(-25 2 18)"/><rect x="1" y="6" width="15" height="6" rx="2" fill="#FFF8EF"/><circle cx="8" cy="19" r="1.3" fill="#FFF8EF"/><circle cx="6" cy="24" r="1.3" fill="#FFF8EF"/></g><g transform="translate(28 6)"><rect x="2" y="10" width="13" height="20" rx="6.5" fill="#2E5B45"/><ellipse cx="15" cy="18" rx="3.4" ry="5" fill="#2E5B45" transform="rotate(25 15 18)"/><rect x="1" y="6" width="15" height="6" rx="2" fill="#FFF8EF"/><circle cx="9" cy="19" r="1.3" fill="#FFF8EF"/><circle cx="11" cy="24" r="1.3" fill="#FFF8EF"/></g></svg>'
+};
+document.querySelectorAll(".screen").forEach((sc, i) => { sc.insertAdjacentHTML("beforeend", DECO.cane + (i % 2 ? DECO.mitt : DECO.gift)); });
+/* 點雪景裡的角色會彈跳、響鈴 */
+document.querySelectorAll(".scene .poke").forEach((g) => g.addEventListener("click", () => {
+  g.classList.remove("boing"); void g.getBBox(); g.classList.add("boing"); audio.play(g.dataset.snd || "tap");
+}));
 
 /* ================= 首頁 ================= */
 function renderHome() {
@@ -907,6 +1012,9 @@ function renderMap() {
     <g fill="#FFFDF8">${Array.from({ length: 26 }, (_, i) => `<circle cx="${(i * 97) % 350 + 5}" cy="${(i * 211) % 540 + 10}" r="${1.5 + (i % 3)}" opacity=".9"/>`).join("")}</g>
     ${tree(30, 380, .9)}${tree(330, 300, 1)}${tree(30, 200, .8)}${tree(334, 176, .8)}${tree(36, 70, .7)}${tree(300, 40, .7)}
     <g transform="translate(286 488)"><rect x="0" y="14" width="44" height="30" rx="3" fill="#B5733E"/><path d="M-4 16 L22 -6 L48 16Z" fill="#8A4A2B" stroke="#FFF8EF" stroke-width="3" stroke-linejoin="round"/><rect x="16" y="28" width="12" height="16" rx="6" fill="#C23A2E"/><rect x="5" y="20" width="8" height="8" fill="#FFD36B"/><rect x="31" y="20" width="8" height="8" fill="#FFD36B"/><circle cx="22" cy="5" r="2.5" fill="#FF5A4E"/></g>
+    <use class="blink" href="#star" x="84" y="30" width="16" height="16" fill="#FFD36B"/><use class="blink" href="#star" x="246" y="56" width="12" height="12" fill="#FFD36B"/><use class="blink" href="#star" x="332" y="232" width="13" height="13" fill="#FFD36B"/><use class="blink" href="#star" x="14" y="250" width="11" height="11" fill="#FFD36B"/>
+    <g transform="translate(110 104)"><rect x="0" y="6" width="18" height="14" rx="2" fill="#C23A2E"/><rect x="7" y="6" width="4" height="14" fill="#FFD36B"/><path d="M9 6 C5 0 1 3 4 6Z M9 6 C13 0 17 3 14 6Z" fill="#FFD36B"/></g>
+    <g transform="translate(206 512)"><path d="M0 30 V8 a6 6 0 0 1 12 0" stroke="#FFF8EF" stroke-width="4.5" fill="none" stroke-linecap="round"/><path d="M0 30 V8 a6 6 0 0 1 12 0" stroke="#C23A2E" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-dasharray="3.5 3.5"/></g>
     <g transform="translate(150 500)"><circle cx="0" cy="16" r="12" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="1.5"/><circle cx="0" cy="-2" r="8.5" fill="#FFFDF8" stroke="#CFE0EA" stroke-width="1.5"/><rect x="-6" y="-16" width="12" height="9" fill="#3B2F2A"/><rect x="-9" y="-8" width="18" height="2.5" fill="#3B2F2A"/><path d="M-6 5 Q0 9 6 5" stroke="#C23A2E" stroke-width="3" fill="none"/><path d="M0 -1 L7 1 L0 2Z" fill="#E58A3A"/></g>
     <path d="${path}" fill="none" stroke="#E7DCCB" stroke-width="16" stroke-linecap="round"/>
     <path d="${path}" fill="none" stroke="#C79A3B" stroke-width="2.5" stroke-dasharray="2 9" stroke-linecap="round"/>
@@ -1009,12 +1117,12 @@ function openStage(id) {
   if (!S.team) { pendingStage = id; show("home"); return; }
   S.unlocked[id] = true; save();
   $("#stageHead").innerHTML = `
-    <div class="chips"><span class="chip red">第${NUM[id]}關</span><span class="chip">${esc(s.type)}</span>
-      <span class="chip plain"><svg width="11" height="11" style="vertical-align:-1px;color:var(--green)"><use href="#pin"/></svg> ${esc(s.place)}</span></div>
+    <div class="chips"><span class="chip red">第${NUM[id]}關</span><span class="chip">${esc(s.type)}</span></div>
     <h2>${esc(s.title)}</h2>
-    <p class="lead">${esc(CONTENT[id].lead)}</p>`;
+    <p class="lead">${esc(content(id).lead)}</p>`;
   const play = $("#stagePlay"); play.innerHTML = "";
   $("#tip").hidden = true;
+  $("#tipAvatar").setAttribute("href", { 1: "#gbman", 2: "#snowhead", 3: "#deerhead" }[id] || "#dedehead");
   show("stage");
   STAGES[id](play, (stars) => finishStage(id, stars));
 }
@@ -1028,7 +1136,8 @@ function shake(el) { el.classList.remove("shake"); void el.offsetWidth; el.class
 /* ================= 共用：選擇題 ================= */
 function mcq(el, { q, opts, ans, hints, onDone }) {
   const box = document.createElement("div"); box.className = "play";
-  box.innerHTML = `<p class="q">${esc(q)}</p><div class="opts">${opts.map((o, i) => `<button class="opt" data-i="${i}"><span class="k">${"ABCD"[i]}</span><span>${esc(o)}</span></button>`).join("")}</div>`;
+  const order = shuffle(opts.map((_, i) => i));
+  box.innerHTML = `<p class="q">${esc(q)}</p><div class="opts">${order.map((i, k) => `<button class="opt" data-i="${i}"><span class="k">${"ABCD"[k]}</span><span>${esc(opts[i])}</span></button>`).join("")}</div>`;
   el.appendChild(box);
   let wrong = 0;
   box.querySelectorAll(".opt").forEach((b) => b.addEventListener("click", () => {
@@ -1144,15 +1253,18 @@ const STAGES = {
 
   /* 03 神祕書單：翻線索卡 → 從書架抽出正確的書 */
   3(el, done) {
-    const clues = ["主角是一位來自外星球的小男孩。", "他曾經造訪許多不同的星球。", "故事中有狐狸、玫瑰，還有一段關於「馴養」的對話。"];
-    const books = [["老人與海", "#6E8EA6"], ["小王子", "#C79A3B"], ["哈利波特", "#2E5B45"], ["夏洛的網", "#C23A2E"]];
+    if (S.p3 == null || !BOOKS3[S.p3]) { S.p3 = Math.floor(Math.random() * BOOKS3.length); save(); }
+    const pick = BOOKS3[S.p3], clues = pick.c;
+    const others = shuffle(BOOKS3.filter((b) => b !== pick)).slice(0, 3);
+    const cols = shuffle(["#6E8EA6", "#C79A3B", "#2E5B45", "#C23A2E"]);
+    const books = shuffle([pick, ...others]).map((b, i) => [b.t, cols[i], b === pick]);
     let flipped = 0, wrong = 0;
     el.innerHTML = `
       <p class="q">翻開線索卡，再從書架上抽出麋鹿老師的書。翻越少張就猜中，得到的雪花越多！</p>
       <div class="clues">${clues.map((c, i) => `<button class="clue" data-i="${i}" aria-label="翻開線索 ${i + 1}"><div class="in">
         <div class="face front"><span class="n">${i + 1}</span>線索卡<i>點我翻開</i></div>
         <div class="face back"><span class="n">${i + 1}</span>${esc(c)}</div></div></button>`).join("")}</div>
-      <div class="shelf locked" id="shelf">${books.map((b, i) => `<button class="spine" data-i="${i}" style="background:${b[1]}">${b[0]}</button>`).join("")}</div>
+      <div class="shelf locked" id="shelf">${books.map((b, i) => `<button class="spine" data-i="${i}" data-ok="${b[2] ? 1 : 0}" style="background:${b[1]};${b[0].length > 5 ? "font-size:15px;letter-spacing:.02em" : ""}">${esc(b[0])}</button>`).join("")}</div>
       <p class="note" style="text-align:center">麋鹿老師的書架</p>`;
     el.querySelectorAll(".clue").forEach((c) => c.addEventListener("click", () => {
       if (c.classList.contains("flipped")) return;
@@ -1164,15 +1276,15 @@ const STAGES = {
     }));
     $("#shelf", el).addEventListener("click", (e) => {
       const b = e.target.closest(".spine"); if (!b || b.disabled) return;
-      if (+b.dataset.i === 1) {
+      if (b.dataset.ok === "1") {
         b.classList.add("right"); el.querySelectorAll(".spine").forEach((x) => (x.disabled = true)); audio.play("ok");
         el.querySelectorAll(".clue").forEach((c) => c.classList.add("flipped"));
-        setTip("就是《<b>小王子</b>》！去書架區找找它的實體封面吧。");
+        setTip(`就是《<b>${esc(pick.t)}</b>》！去書架區找找它的實體書吧。`);
         const stars = Math.max(1, 4 - flipped - wrong);
         setTimeout(() => done(stars), 1100);
       } else {
         b.classList.add("wrong"); b.disabled = true; wrong++; audio.play("no");
-        setTip(flipped < 3 ? "不是這本喔。要不要<b>再翻一張線索</b>？" : "注意「狐狸」和「玫瑰」，是哪本書呢？");
+        setTip(flipped < 3 ? "不是這本喔。要不要<b>再翻一張線索</b>？" : pick.h);
       }
     });
     setTip("麋鹿老師最愛的書不見了！先翻開<b>第一張</b>線索卡。");
@@ -1291,7 +1403,7 @@ function finishStage(id, stars) {
 function starRow(n) { return `<div class="stars" aria-label="${n} 顆雪花">${[1, 2, 3].map((i) => `<svg style="color:${i <= n ? "var(--gold)" : "var(--line)"}"><use href="#star" fill="currentColor"/></svg>`).join("")}</div>`; }
 
 function openReward(id, stars, viewOnly) {
-  const s = stage(id), c = CONTENT[id];
+  const s = stage(id), c = content(id);
   const ov = overlay(`
     <div class="modal" style="margin-top:56px">
       <div class="seal-big ${id === 5 ? "gold" : ""}">${esc(s.char)}</div>
@@ -1306,7 +1418,7 @@ function openReward(id, stars, viewOnly) {
       if (viewOnly) return;
       if (id === 5) { show("story"); return; }
       show("map");
-      if (firstFourDone() && !S.badge4) { S.badge4 = true; save(); setTimeout(() => toast("獲得徽章「故事收藏家」！最後一關已開放"), 300); }
+      if (firstFourDone() && !S.badge4) { S.badge4 = true; save(); setTimeout(() => toast("獲得徽章「故事小書蟲」！最後一關已開放"), 300); }
     });
   return ov;
 }
@@ -1335,11 +1447,11 @@ function renderBook() {
   const four = firstFourDone(), five = isDone(5);
   $("#badges").innerHTML = `
     <div class="badge ${four ? "on" : ""}"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 3l17 7v12c0 11-8 19-17 23C15 41 7 33 7 22V10z" fill="#C23A2E"/><rect x="15" y="15" width="18" height="20" rx="2" fill="#FFF8EF"/><path d="M19 21h10M19 25h10M19 29h6" stroke="#2E5B45" stroke-width="2"/></svg>
-      <div><b>初階｜故事收藏家</b><span>集滿前四片故事碎片</span></div></div>
+      <div><b>初階｜故事小書蟲</b><span>集滿前四片故事碎片</span></div></div>
     <div class="badge ${five ? "on" : ""}"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#star" fill="#C79A3B"/><use href="#dedehead" x="12" y="13" width="24" height="24"/></svg>
-      <div><b>進階｜聖誕閱讀探險家</b><span>完成全部五關</span></div></div>`;
+      <div><b>進階｜聖誕故事收藏家</b><span>完成全部五關</span></div></div>`;
   $("#pages").innerHTML = C.stages.map((s) => {
-    const got = isDone(s.id), c = CONTENT[s.id];
+    const got = isDone(s.id), c = content(s.id);
     return `<button class="fpage ${got ? "got" : "snowy"} ${s.id === 5 ? "final" : ""}" data-id="${s.id}">
       <span class="num">${got ? esc(s.char) : s.id}</span>
       <div><b>${got ? esc(c.frag.title) : `第${NUM[s.id]}章　（被大雪蓋住了）`}</b>
@@ -1354,13 +1466,13 @@ function renderBook() {
 /* 重新開始：任何畫面上的 [data-reset] 按鈕都會先跳出確認視窗 */
 function askReset() {
   const ov = overlay(`<div class="modal">
-      <svg viewBox="0 0 80 80" width="72" style="margin:0 auto" aria-hidden="true"><use href="#dedehead"/></svg>
+      <svg viewBox="0 0 80 80" width="80" style="margin:0 auto" aria-hidden="true"><use href="#snowhead"/></svg>
       <h3>要重新開始遊戲嗎？</h3>
       <p>這支手機上的登入資料、闖關進度和完賽證書都會清除，回到第一關重新玩。</p>
       <div class="btn-row"><button class="btn ghost" data-close>先不要</button><button class="btn" id="resetYes">確定重新開始</button></div>
     </div>`);
   $("#resetYes", ov).onclick = () => {
-    const mute = S.mute; S = fresh(); S.mute = mute; save(); pendingStage = 0;
+    const snd = S.snd; S = fresh(); S.snd = snd; save(); pendingStage = 0;
     closeOverlay(true); show("home"); toast("已重新開始，請重新登入");
   };
 }
@@ -1370,7 +1482,7 @@ document.addEventListener("click", (e) => { if (e.target.closest("[data-reset]")
 function renderStory() {
   $("#fullStory").innerHTML = `
     <div class="chapter"><h3><span>序</span>失竊的故事書</h3>${PROLOGUE.slice(0, 2).map((p) => `<p>${esc(p)}</p>`).join("")}</div>
-    ${[1, 2, 3, 4, 5].map((i) => `<div class="chapter"><h3><span>${esc(stage(i).char)}</span>${esc(CONTENT[i].frag.title.split("　")[1])}</h3><p>${esc(CONTENT[i].frag.text)}</p></div>`).join("")}
+    ${[1, 2, 3, 4, 5].map((i) => `<div class="chapter"><h3><span>${esc(stage(i).char)}</span>${esc(content(i).frag.title.split("　")[1])}</h3><p>${esc(content(i).frag.text)}</p></div>`).join("")}
     <p class="moral">閱讀讓愛與溫暖延續</p>`;
 }
 $("#btnToCert").onclick = () => show("cert");
@@ -1399,10 +1511,10 @@ function renderCert() {
       <text x="60" y="84" text-anchor="middle" font-family="Noto Sans TC, sans-serif" font-size="6.5" font-weight="700" letter-spacing="1" fill="#C79A3B">XMAS 2026</text>
     </svg>
     <p class="lbl">ADVENTURE CERTIFICATE</p>
-    <h2>聖誕閱讀探險家</h2>
+    <h2>聖誕故事收藏家</h2>
     <p style="font-size:15px;color:var(--ink-soft);margin-bottom:-8px">${esc(S.cls ? `${S.cls} 班　${S.seat} 號` : "")}</p>
     <div class="who">${esc(S.name || S.team)}</div>
-    <p style="font-family:var(--font-story);font-size:17px;max-width:22em">完成了 DeDe 的五項閱讀挑戰，找回失竊的聖誕故事，正式成為四維聖誕閱讀探險家！</p>
+    <p style="font-family:var(--font-story);font-size:17px;max-width:22em">完成了 DeDe 的五項閱讀挑戰，找回失竊的聖誕故事，正式成為四維聖誕故事收藏家！</p>
     <div class="chars-row">${C.stages.map((s) => `<span${s.id === 5 ? ' style="background:var(--gold)"' : ""}>${esc(s.char)}</span>`).join("")}</div>
     <div class="cert-grid">
       <div><b>${fmt(S.finishedAt - S.startedAt)}</b><span>完成時間</span></div>
@@ -1455,13 +1567,13 @@ async function downloadCert(total) {
   x.fillStyle = "#C79A3B"; x.font = "700 20px " + ui; x.fillText("XMAS 2026", 600, 326);
   x.textAlign = "center";
   x.fillStyle = "#C79A3B"; x.font = "700 28px " + ui; x.fillText("A D V E N T U R E   C E R T I F I C A T E", 600, 560);
-  x.fillStyle = "#3B2F2A"; x.font = "700 76px " + story; x.fillText("聖誕閱讀探險家", 600, 660);
+  x.fillStyle = "#3B2F2A"; x.font = "700 76px " + story; x.fillText("聖誕故事收藏家", 600, 660);
   x.fillStyle = "#7A6A60"; x.font = "34px " + ui; if (S.cls) x.fillText(`${S.cls} 班　${S.seat} 號`, 600, 720);
   x.fillStyle = "#C23A2E"; x.font = "700 84px " + story; x.fillText(S.name || S.team, 600, 800, 900);
   x.strokeStyle = "#E7DCCB"; x.lineWidth = 3; x.beginPath(); x.moveTo(300, 830); x.lineTo(900, 830); x.stroke();
   x.fillStyle = "#3B2F2A"; x.font = "36px " + story;
   x.fillText("完成了 DeDe 的五項閱讀挑戰，找回失竊的聖誕故事，", 600, 910);
-  x.fillText("正式成為四維聖誕閱讀探險家！", 600, 965);
+  x.fillText("正式成為四維聖誕故事收藏家！", 600, 965);
   C.stages.forEach((st, i) => { const cx = 600 + (i - 2) * 110; x.fillStyle = i === 4 ? "#C79A3B" : "#2E5B45"; x.beginPath(); x.arc(cx, 1060, 42, 0, 7); x.fill(); x.fillStyle = "#FFF8EF"; x.font = "700 40px " + story; x.fillText(st.char, cx, 1074); });
   const stats = [[fmt(S.finishedAt - S.startedAt), "完成時間"], [total + "/15", "雪花"], [fmtDate(S.finishedAt), "完賽時刻"]];
   stats.forEach(([v, l], i) => { const cx = 330 + i * 270; x.fillStyle = "#3B2F2A"; x.font = "700 44px " + ui; x.fillText(v, cx, 1200); x.fillStyle = "#7A6A60"; x.font = "26px " + ui; x.fillText(l, cx, 1242); });
@@ -1489,16 +1601,83 @@ const audio = (() => {
   };
   const SFX = {
     tap: () => note(880, 0, 0.12, "triangle", 0.08),
+    bell: () => { note(1319, 0, 0.5, "sine", 0.12); note(1760, 0.06, 0.6, "sine", 0.08); },
+    boop: () => { note(392, 0, 0.18, "triangle", 0.12); note(523, 0.08, 0.2, "triangle", 0.1); },
     paper: () => { note(520, 0, 0.1, "triangle", 0.06); note(660, 0.05, 0.12, "triangle", 0.06); },
     ok: () => { note(784, 0, 0.3); note(1175, 0.09, 0.4); },
     no: () => note(196, 0, 0.25, "square", 0.05),
     start: () => [523, 659, 784, 1047].forEach((f, i) => note(f, i * 0.09, 0.4, "sine", 0.14)),
     win: () => [659, 659, 659, 0, 659, 659, 659, 0, 659, 784, 523, 587, 659].forEach((f, i) => f && note(f, i * 0.13, 0.32, "sine", 0.13))
   };
-  return { unlock, play(n) { if (S.mute) return; unlock(); if (ctx && SFX[n]) try { SFX[n](); } catch (e) {} } };
+  return { unlock, ctx: () => ctx, play(n) { if (S.snd === 2) return; unlock(); if (ctx && SFX[n]) try { SFX[n](); } catch (e) {} } };
 })();
-document.addEventListener("pointerdown", () => audio.unlock(), { once: true });
-$("#btnSound").onclick = () => { S.mute = !S.mute; save(); updateBar(); toast(S.mute ? "音效已關閉" : "音效已開啟", 1400); };
+
+/* 聖誕音樂：用 WebAudio 即時演奏公版聖誕歌曲（Jingle Bells、We Wish You a Merry Christmas），不需音樂檔 */
+const music = (() => {
+  const NOTE = { C: 0, "C#": 1, D: 2, "D#": 3, E: 4, F: 5, "F#": 6, G: 7, "G#": 8, A: 9, "A#": 10, B: 11 };
+  const midi = (n) => { const m = n.match(/^([A-G]#?)(\d)$/); return 12 * (+m[2] + 1) + NOTE[m[1]]; };
+  const seq = (str) => str.trim().split(/\s+/).map((t) => { const [n, d] = t.split(":"); return [n === "R" ? 0 : midi(n), +d]; });
+  const SONGS = [
+    { bpm: 172, bells: true,
+      mel: seq(`E5:1 E5:1 E5:2 E5:1 E5:1 E5:2 E5:1 G5:1 C5:1.5 D5:.5 E5:4 F5:1 F5:1 F5:1.5 F5:.5 F5:1 E5:1 E5:1 E5:.5 E5:.5 E5:1 D5:1 D5:1 E5:1 D5:2 G5:2
+                E5:1 E5:1 E5:2 E5:1 E5:1 E5:2 E5:1 G5:1 C5:1.5 D5:.5 E5:4 F5:1 F5:1 F5:1.5 F5:.5 F5:1 E5:1 E5:1 E5:.5 E5:.5 G5:1 G5:1 F5:1 D5:1 C5:4`),
+      bass: seq("C3:2 G3:2 C3:2 G3:2 C3:2 G3:2 C3:2 G3:2 F3:2 C3:2 C3:2 G3:2 D3:2 A3:2 G2:2 D3:2 C3:2 G3:2 C3:2 G3:2 C3:2 G3:2 C3:2 G3:2 F3:2 C3:2 C3:2 G3:2 G2:2 D3:2 C3:4") },
+    { bpm: 150, bells: false,
+      mel: seq(`D5:1 G5:1 G5:.5 A5:.5 G5:.5 F#5:.5 E5:1 E5:1 E5:1 A5:1 A5:.5 B5:.5 A5:.5 G5:.5 F#5:1 D5:1 D5:1 B5:1 B5:.5 C6:.5 B5:.5 A5:.5 G5:1 E5:1 D5:.5 D5:.5 E5:1 A5:1 F#5:1 G5:3`),
+      bass: seq("R:1 G3:3 C3:3 A2:3 D3:3 B2:3 E3:3 C3:1.5 D3:1.5 G2:3") }
+  ];
+  let timer = 0, songI = 0, t0 = 0, mi = 0, bi = 0, mt = 0, bt = 0, beat = 0, out = null, noise = null, playing = false;
+  const voice = (ctx, f, t, d, type, v, partial) => {
+    const o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.value = f; o.connect(g); g.connect(out);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0008, t + d);
+    o.start(t); o.stop(t + d + 0.05);
+    if (partial) { const o2 = ctx.createOscillator(), g2 = ctx.createGain(); o2.frequency.value = f * 2.76; o2.connect(g2); g2.connect(out);
+      g2.gain.setValueAtTime(0, t); g2.gain.linearRampToValueAtTime(v * 0.25, t + 0.008); g2.gain.exponentialRampToValueAtTime(0.0008, t + d * 0.4); o2.start(t); o2.stop(t + d); }
+  };
+  const jingle = (ctx, t) => {
+    if (!noise) { noise = ctx.createBuffer(1, ctx.sampleRate * 0.25, ctx.sampleRate); const d = noise.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3); }
+    const src = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), g = ctx.createGain();
+    src.buffer = noise; hp.type = "highpass"; hp.frequency.value = 7000; g.gain.value = 0.12; src.connect(hp); hp.connect(g); g.connect(out); src.start(t);
+  };
+  const hz = (m) => 440 * Math.pow(2, (m - 69) / 12);
+  const tick = () => {
+    const ctx = audio.ctx(); if (!ctx) return;
+    const song = SONGS[songI], spb = 60 / song.bpm, ahead = ctx.currentTime + 0.25;
+    while (t0 + mt * spb < ahead && mi < song.mel.length) { const [m, d] = song.mel[mi]; if (m) voice(ctx, hz(m), t0 + mt * spb, Math.max(0.35, d * spb * 1.3), "sine", 0.075, true); mt += d; mi++; }
+    while (t0 + bt * spb < ahead && bi < song.bass.length) { const [m, d] = song.bass[bi]; if (m) voice(ctx, hz(m), t0 + bt * spb, d * spb * 0.9, "triangle", 0.06, false); bt += d; bi++; }
+    if (song.bells) while (t0 + beat * spb < ahead && beat < mt) { if (beat % 2 === 1) jingle(ctx, t0 + beat * spb); beat++; }
+    if (mi >= song.mel.length && bi >= song.bass.length && ctx.currentTime > t0 + Math.max(mt, bt) * spb + 1.2) { songI = (songI + 1) % SONGS.length; reset(ctx.currentTime + 0.3); }
+  };
+  const reset = (at) => { t0 = at; mi = bi = 0; mt = bt = beat = 0; };
+  return {
+    start() {
+      if (playing || S.snd !== 0) return; audio.unlock(); const ctx = audio.ctx(); if (!ctx) return;
+      if (!out) { out = ctx.createGain(); out.connect(ctx.destination); }
+      out.gain.cancelScheduledValues(ctx.currentTime); out.gain.setValueAtTime(0.0001, ctx.currentTime); out.gain.exponentialRampToValueAtTime(1, ctx.currentTime + 0.6);
+      playing = true; reset(ctx.currentTime + 0.15); timer = setInterval(tick, 60); paintMusicBtn();
+    },
+    stop() {
+      if (!playing) return; playing = false; clearInterval(timer); const ctx = audio.ctx();
+      if (ctx && out) { const o = out; o.gain.cancelScheduledValues(ctx.currentTime); o.gain.setValueAtTime(o.gain.value, ctx.currentTime); o.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.3); out = null; setTimeout(() => o.disconnect(), 400); }
+      paintMusicBtn();
+    },
+    get playing() { return playing; }
+  };
+})();
+function paintMusicBtn() {
+  const b = $("#btnMusic"); if (!b) return;
+  $("#icoMusic").hidden = S.snd !== 0; $("#icoSfx").hidden = S.snd !== 1; $("#icoMute").hidden = S.snd !== 2;
+  $("#musicLbl").textContent = ["音樂", "音效", "靜音"][S.snd];
+  b.classList.toggle("on", S.snd === 0 && music.playing);
+}
+if (S.snd == null) S.snd = S.mute ? 2 : 0;
+document.addEventListener("pointerdown", () => { audio.unlock(); music.start(); }, { once: true });
+document.addEventListener("visibilitychange", () => { if (document.hidden) music.stop(); else if (S.snd === 0 && audio.ctx()) music.start(); });
+$("#btnMusic").onclick = () => {
+  S.snd = (S.snd + 1) % 3; save();
+  if (S.snd === 0) music.start(); else music.stop();
+  paintMusicBtn(); toast(["聖誕音樂＋音效：開", "只保留音效", "全部靜音"][S.snd], 1400);
+};
 $("#btnMap").onclick = () => show("map");
 $("#btnBook").onclick = () => show("book");
 
